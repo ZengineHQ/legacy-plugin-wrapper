@@ -28,6 +28,10 @@ plugin.sizer = new ContentSizer(async dimensions => {
   return result
 })
 
+async function compileProviderIsReady () {
+  return plugin.compileProvider || Promise.resolve(compileProviderIsReady())
+}
+
   /**
    * Wizehive controller
    *
@@ -90,6 +94,8 @@ plugin.sizer = new ContentSizer(async dimensions => {
       if (!angular.isObject(settings)) {
         throw new Error('Plugin registration settings must be an object')
       }
+
+      await compileProviderIsReady()
 
       context = await client.call({ method: 'context' })
 
