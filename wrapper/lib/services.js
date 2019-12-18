@@ -1037,19 +1037,22 @@ export function Services (plugin) {
 
         Object.keys(options.btns)
           .forEach(function (name) {
+            events.push(name)
+
             if (typeof options.btns[name].action === 'function') {
               callbacks[name] = options.btns[name].action
-              events.push(name)
               options.btns[name].action = name
-
-              client.subscribe(name, (payload = {}) => {
-                callbacks[name](payload.data)
-
-                if (options.btns[name].close !== false && !payload.keepOpen) {
-                  client.call({ method: 'close-modal' })
-                }
-              })
             }
+
+            client.subscribe(name, (payload = {}) => {
+              if (typeof options.btns[name].action === 'function') {
+                callbacks[name](payload.data)
+              }
+
+              if (options.btns[name].close !== false && !payload.keepOpen) {
+                client.call({ method: 'close-modal' })
+              }
+            })
           })
 
         let isOpen = true
