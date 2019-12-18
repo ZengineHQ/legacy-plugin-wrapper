@@ -1039,13 +1039,15 @@ export function Services (plugin) {
           .forEach(function (name) {
             events.push(name)
 
-            if (typeof options.btns[name].action === 'function') {
+            const hasAction = typeof options.btns[name].action === 'function'
+
+            if (hasAction) {
               callbacks[name] = options.btns[name].action
               options.btns[name].action = name
             }
 
             client.subscribe(name, (payload = {}) => {
-              if (typeof options.btns[name].action === 'function') {
+              if (hasAction) {
                 callbacks[name](payload.data)
               }
 
