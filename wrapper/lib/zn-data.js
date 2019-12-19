@@ -212,6 +212,36 @@ export function ZnData (plugin) {
       }
     }
 
+    function _flattenObject(ob) {
+      const toReturn = {}
+
+      for (let i in ob) {
+
+        if (!ob[i]) {
+          continue
+        }
+
+        if ((typeof ob[i]) == 'object') {
+          if (ob[i] instanceof Array) {
+            toReturn[i] = ob[i].join(',')
+          } else {
+            let flatObject = _flattenObject(ob[i])
+            for (let x in flatObject) {
+
+              if (!flatObject[x]) {
+                continue
+              }
+
+              toReturn[i + '.' + x] = flatObject[x]
+            }
+          }
+        } else {
+          toReturn[i] = ob[i]
+        }
+      }
+      return toReturn
+    }
+
     function request (path, options, method, params, data, successCb, errorCb) {
       const { pathParams, objectVersionField } = options
 
@@ -252,6 +282,9 @@ export function ZnData (plugin) {
         delete params[objectVersionField]
       }
       var deferred = $q.defer()
+
+      //flatten param object as is done in the original implementation of znData in anglerfish
+      params = _flattenObject(params);
 
       const call = () => {
         plugin.client.call({
