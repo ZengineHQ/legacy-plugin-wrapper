@@ -1040,7 +1040,8 @@ export function Services (plugin) {
           btns: {},
           header: null,
           closeButton: true,
-          error: false
+		  error: false,
+		  width: null,
         }, options)
 
         if (options.error) {
@@ -1078,14 +1079,16 @@ export function Services (plugin) {
           })
 
         let isOpen = true
-        let width = null
+        let width = options.width
 
-        if (options.classes) {
+        if (!options.width && options.classes) {
 
-          if (options.classes.indexOf('wide-modal')) {
+          if (options.classes.indexOf('wide-modal') > -1) {
             width = '80%'
-          } else if (options.classes.indexOf('modal-filter-panel')) {
+          } else if (options.classes.indexOf('modal-filter-panel') > -1) {
             width = '830px'
+          } else if (options.classes.indexOf('modal-narrow') > -1) {
+            width = '450px'
           }
 
         }
