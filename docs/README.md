@@ -25,6 +25,8 @@ Originally, our plugin system applied plugin code to Zengine Admin UI by directl
 
 2. In certain cases, like for many AngularJS directives (UI components), the only way to regain access to these elements is for the directive code to be injected into each plugin (so that it is now present with the plugin code in the iframe). Therefore, this _wrapper_ contains certain pieces of code from the Admin UI application to ensure that plugins have _nearly_ exactly the same look, feel, and functionality before and after a migration.
 
+Therefore, this project forms the basis for converting "legacy" plugins into full-blown SPAs designed to run within an iframe in the new Zengine plugin system.
+
 ## Process Details
 
 1. Ensure your structure is correct
