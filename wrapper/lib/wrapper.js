@@ -28,6 +28,23 @@ plugin.sizer = new ContentSizer(async dimensions => {
   return result
 })
 
+function sleep (ms) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => resolve(), ms)
+  })
+}
+
+async function compileProviderIsReady () {
+  if (plugin.compileProvider) {
+    return
+  }
+
+  // if we have to wait, we'll wait no longer than a 60fps frame before checking again #perf
+  await sleep(16)
+
+  return compileProviderIsReady()
+}
+
   /**
    * Wizehive controller
    *
@@ -90,6 +107,8 @@ plugin.sizer = new ContentSizer(async dimensions => {
       if (!angular.isObject(settings)) {
         throw new Error('Plugin registration settings must be an object')
       }
+
+      await compileProviderIsReady()
 
       context = await client.call({ method: 'context' })
 
