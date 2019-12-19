@@ -213,33 +213,33 @@ export function ZnData (plugin) {
     }
 
     function _flattenObject(ob) {
-      var toReturn = {};
+      const toReturn = {}
 
-      for (var i in ob) {
+      for (let i in ob) {
 
-        if (!ob.hasOwnProperty(i)) {
-          continue;
+        if (!ob[i]) {
+          continue
         }
 
         if ((typeof ob[i]) == 'object') {
           if (ob[i] instanceof Array) {
-            toReturn[i] = ob[i].join(',');
+            toReturn[i] = ob[i].join(',')
           } else {
-            var flatObject = _flattenObject(ob[i]);
-            for (var x in flatObject) {
+            let flatObject = _flattenObject(ob[i])
+            for (let x in flatObject) {
 
-              if (!flatObject.hasOwnProperty(x)) {
-                continue;
+              if (!flatObject[x]) {
+                continue
               }
 
-              toReturn[i + '.' + x] = flatObject[x];
+              toReturn[i + '.' + x] = flatObject[x]
             }
           }
         } else {
-          toReturn[i] = ob[i];
+          toReturn[i] = ob[i]
         }
       }
-      return toReturn;
+      return toReturn
     }
 
     function request (path, options, method, params, data, successCb, errorCb) {
