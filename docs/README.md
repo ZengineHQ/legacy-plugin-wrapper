@@ -17,7 +17,7 @@ If you just want a snapshot of the steps, try walking through this first, and co
 6. `npm run build` to create zip file
 7. Use Zengine Developer UI to post a draft and/or publish the fully migrated plugin
 
-## What Exactly Is Happening?
+## Background
 
 Originally, our plugin system applied plugin code to Zengine Admin UI by directly injecting valid AngularJS code and CSS into the Admin UI. For a variety of reasons, we at WizeHive felt this was not ideal long term, and so our solution has been to make each plugin an independent application that can run independently from the Admin UI in an iframe. This has two implications for how existing plugins need to be adjusted in order to work in the future:
 
