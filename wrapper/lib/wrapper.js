@@ -357,7 +357,7 @@ async function compileProviderIsReady () {
           })
         })
 
-        $scope.close = function() {
+        $scope.close = function () {
           client.call({ method: 'close', args: { payload: {} } })
         }
 
@@ -449,7 +449,7 @@ async function compileProviderIsReady () {
 
         if (plugin.currentInterface.routes) {
 
-          angular.forEach(plugin.currentInterface.routes, function(routeDefinition) {
+          angular.forEach(plugin.currentInterface.routes, function (routeDefinition) {
 
             // strip out any * or ? - not supported for now
             var routeDef = routeDefinition.replace(/\*|\?/g, '')
@@ -463,7 +463,7 @@ async function compileProviderIsReady () {
 
               var additionalRouteParams = {}
 
-              angular.forEach(paramsArr, function(param, index) {
+              angular.forEach(paramsArr, function (param, index) {
 
                 if (param.indexOf(':') === 0) {
 

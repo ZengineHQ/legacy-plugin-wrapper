@@ -1,11 +1,11 @@
 import { client } from './wrapper'
 
-export function Services(plugin) {
+export function Services (plugin) {
 
-  function sanitizeForPostMessage(obj) {
+  function sanitizeForPostMessage (obj) {
     const referenceMap = new Map()
 
-    function sanitize(obj) {
+    function sanitize (obj) {
       if (referenceMap.has(obj)) {
         // the reference at this location is what we want
         // (either circular object or a primitive we've seen before)
@@ -104,7 +104,7 @@ export function Services(plugin) {
   }
 
   plugin
-    .factory('RecursionHelper', ['$compile', function RecursionHelperFactory($compile) {
+    .factory('RecursionHelper', ['$compile', function RecursionHelperFactory ($compile) {
       return {
         /**
          * Manually compiles the element, fixing the recursion loop.
@@ -145,7 +145,7 @@ export function Services(plugin) {
         }
       }
     }])
-    .factory('filterDefinition', ['inlineFilter', function filterDefinitionFactory(inlineFilter) {
+    .factory('filterDefinition', ['inlineFilter', function filterDefinitionFactory (inlineFilter) {
       /**
        * Get Operator
        *
@@ -154,7 +154,7 @@ export function Services(plugin) {
        * @param	{object}	filter
        * @returns	{string}
        */
-      function getOperator(filter) {
+      function getOperator (filter) {
         return inlineFilter.getOperator(filter)
       }
 
@@ -166,7 +166,7 @@ export function Services(plugin) {
      * @param	{object}	filter
      * @returns	{object}	parsed
      */
-      function parseFilter(filter) {
+      function parseFilter (filter) {
         var operator = getOperator(filter)
 
         if (!operator) {
@@ -468,7 +468,7 @@ export function Services(plugin) {
      * @since	0.5.75
      */
     .service('inlineFilter', ['inlineFilterOperators', '$rootScope',
-      function inlineFilterService(inlineFilterOperators, $rootScope) {
+      function inlineFilterService (inlineFilterOperators, $rootScope) {
         var svc = this
 
         /**
@@ -679,7 +679,7 @@ export function Services(plugin) {
           return disallowedFieldTypes.concat(fieldTypeBlacklist)
         }
       }])
-    .service('filterWorkspace', ['$rootScope', '$q', function filterWorkspaceService($rootScope, $q) {
+    .service('filterWorkspace', ['$rootScope', '$q', function filterWorkspaceService ($rootScope, $q) {
       /**
        * Workspace Data Indexed by Workspace Id
        *
@@ -693,7 +693,7 @@ export function Services(plugin) {
      * @param	{object}	options
      * @returns	{promise}
      */
-      function getWorkspace() {
+      function getWorkspace () {
         if ($rootScope.workspace) {
           return $q.when($rootScope.workspace)
         }
@@ -715,7 +715,7 @@ export function Services(plugin) {
      * @param	{array}	workspaceForms
      * @returns	{object}
      */
-      function indexWorkspaceForms(workspaceForms) {
+      function indexWorkspaceForms (workspaceForms) {
         var forms = {}
 
         angular.forEach(workspaceForms, function (form) {
@@ -731,7 +731,7 @@ export function Services(plugin) {
      * @param	{array}	workspaceMembers
      * @returns	{object}
      */
-      function setWorkspaceUsers(workspaceMembers) {
+      function setWorkspaceUsers (workspaceMembers) {
         var users = []
         angular.forEach(workspaceMembers, function (member) {
           users.push(member.user)
@@ -777,18 +777,18 @@ export function Services(plugin) {
         }
       }
     }])
-    .factory('validateFilterOptions', ['inlineFilter', function validateFilterOptions(inlineFilter) {
+    .factory('validateFilterOptions', ['inlineFilter', function validateFilterOptions (inlineFilter) {
       var genericMessage = 'Invalid filter passed to znFiltersPanel. '
 
-      function optionsError(message) {
+      function optionsError (message) {
         throw new Error(genericMessage + message)
       }
 
-      function getOperator(filter) {
+      function getOperator (filter) {
         return inlineFilter.getOperator(filter)
       }
 
-      function getAttributeType(attribute, fields) {
+      function getAttributeType (attribute, fields) {
         if (attribute.indexOf('field') === -1) {
           return undefined
         }
@@ -806,7 +806,7 @@ export function Services(plugin) {
         return type
       }
 
-      function validateSubfilters(filter, subfilters) {
+      function validateSubfilters (filter, subfilters) {
         if (subfilters !== false) {
           return
         }
@@ -824,7 +824,7 @@ export function Services(plugin) {
         })
       }
 
-      function validateGroups(filter, groups) {
+      function validateGroups (filter, groups) {
         if (groups !== false) {
           return
         }
@@ -842,7 +842,7 @@ export function Services(plugin) {
         })
       }
 
-      function validateDynamicValues(filter, dynamicValues) {
+      function validateDynamicValues (filter, dynamicValues) {
         if (dynamicValues !== false) {
           return
         }
@@ -864,7 +864,7 @@ export function Services(plugin) {
         })
       }
 
-      function validateOperators(filter, operators) {
+      function validateOperators (filter, operators) {
         var allowedOperators = ['and', 'or']
 
         if (!angular.isArray(operators)) {
@@ -906,7 +906,7 @@ export function Services(plugin) {
         })
       }
 
-      function validateAttributesBlacklist(filter, attributeBlacklist) {
+      function validateAttributesBlacklist (filter, attributeBlacklist) {
         if (!angular.isArray(attributeBlacklist)) {
           return
         }
@@ -932,7 +932,7 @@ export function Services(plugin) {
         })
       }
 
-      function validateFieldTypesBlacklist(filter, fieldTypeBlacklist, formId, forms) {
+      function validateFieldTypesBlacklist (filter, fieldTypeBlacklist, formId, forms) {
         if (!angular.isArray(fieldTypeBlacklist)) {
           return
         }
