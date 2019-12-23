@@ -147,7 +147,7 @@ async function compileProviderIsReady () {
       }])
 
       // Code inspired by: https://code.angularjs.org/1.2.21/docs/api/ng/function/angular.injector
-      const pluginDiv = angular.element('<div plugin ng-class="type"></div>')
+      const pluginDiv = angular.element('<div plugin></div>')
 
       angular.element(document.body).append(pluginDiv)
 
