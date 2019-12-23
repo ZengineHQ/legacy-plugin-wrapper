@@ -29,7 +29,7 @@ plugin.sizer = new ContentSizer(async dimensions => {
 })
 
 function sleep (ms) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     setTimeout(() => resolve(), ms)
   })
 }
@@ -52,7 +52,7 @@ async function compileProviderIsReady () {
    *
    * @since 0.x.x
    */
-  ; (function (plugin) {
+  (function (plugin) {
     const controllers = {}
     let context = null
 

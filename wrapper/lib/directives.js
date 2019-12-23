@@ -2048,7 +2048,7 @@ export function Directives (plugin) {
         link: function (scope, element, attrs) {
           let isOpen = false
 
-          element.on('mouseenter', e => {
+          element.on('mouseenter', () => {
             const { top, left, right, bottom } = element.context.getBoundingClientRect()
             const options = {
               top,
@@ -2070,7 +2070,7 @@ export function Directives (plugin) {
             isOpen = true
           })
 
-          element.on('mouseleave', e => {
+          element.on('mouseleave', () => {
             isOpen && plugin.client.call({
               method: 'closeTooltip'
             })
@@ -2078,7 +2078,7 @@ export function Directives (plugin) {
             isOpen = false
           })
 
-          element.on('$destroy', e => {
+          element.on('$destroy', () => {
             isOpen && plugin.client.call({
               method: 'closeTooltip'
             })
