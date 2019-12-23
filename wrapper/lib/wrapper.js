@@ -117,10 +117,13 @@ async function compileProviderIsReady () {
       let currentInterface = {}
 
       const isModal = context.pluginView.type === 'modal'
-
-      if (isModal && context.seedData) {
+      const isInline = context.pluginView.type === 'inline'
+      if (isModal) {
         currentInterface.template = 'modal-template'
         currentInterface.controller = 'modalCntl'
+      } else if (isInline) {
+        currentInterface = (settings.interfaces &&
+          settings.interfaces.find(iface => context.pluginView && iface && iface.location === context.pluginView.location)) || settings
       } else {
         currentInterface = (settings.interfaces &&
           settings.interfaces.find(iface => context.pluginView && iface && iface.type === context.pluginView.type)) || settings
