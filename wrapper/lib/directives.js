@@ -2046,19 +2046,40 @@ export function Directives (plugin) {
       return {
         restrict: 'A',
         link: function (scope, element, attrs) {
-          const options = {}
+          let isOpen = false
 
           element.on('mouseenter', e => {
+            const { top, left, right, bottom } = element.context.getBoundingClientRect()
+            const options = {
+              top,
+              left,
+              bottom,
+              right,
+              message: attrs.znTooltip,
+              side: attrs.tooltipPlacement,
+              delay: Number(attrs.tooltipPopupDelay)
+            }
+
             plugin.client.call({
               method: 'openTooltip',
               args: {
                 options
               }
             })
+
+            isOpen = true
           })
 
           element.on('mouseleave', e => {
-            plugin.client.call({
+            isOpen && plugin.client.call({
+              method: 'closeTooltip'
+            })
+
+            isOpen = false
+          })
+
+          element.on('$destroy', e => {
+            isOpen && plugin.client.call({
               method: 'closeTooltip'
             })
           })
