@@ -2042,4 +2042,27 @@ export function Directives (plugin) {
         }
       }
     }])
+    .directive('znTooltip', [function () {
+      return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
+          const options = {}
+
+          element.on('mouseenter', e => {
+            plugin.client.call({
+              method: 'openTooltip',
+              args: {
+                options
+              }
+            })
+          })
+
+          element.on('mouseleave', e => {
+            plugin.client.call({
+              method: 'closeTooltip'
+            })
+          })
+        }
+      }
+    }])
 }
