@@ -29,7 +29,7 @@ plugin.sizer = new ContentSizer(async dimensions => {
 })
 
 function sleep (ms) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     setTimeout(() => resolve(), ms)
   })
 }
@@ -52,7 +52,7 @@ async function compileProviderIsReady () {
    *
    * @since 0.x.x
    */
-  ; (function (plugin) {
+  (function (plugin) {
     const controllers = {}
     let context = null
 
@@ -117,10 +117,14 @@ async function compileProviderIsReady () {
       let currentInterface = {}
 
       const isModal = context.pluginView.type === 'modal'
+      const isInline = context.pluginView.type === 'inline'
 
-      if (isModal && context.seedData) {
+      if (isModal) {
         currentInterface.template = 'modal-template'
         currentInterface.controller = 'modalCntl'
+      } else if (isInline) {
+        currentInterface = (settings.interfaces &&
+          settings.interfaces.find(iface => context.pluginView && iface && iface.location === context.pluginView.location)) || settings
       } else {
         currentInterface = (settings.interfaces &&
           settings.interfaces.find(iface => context.pluginView && iface && iface.type === context.pluginView.type)) || settings
@@ -147,7 +151,7 @@ async function compileProviderIsReady () {
       }])
 
       // Code inspired by: https://code.angularjs.org/1.2.21/docs/api/ng/function/angular.injector
-      const pluginDiv = angular.element('<div plugin ng-class="type"></div>')
+      const pluginDiv = angular.element('<div plugin></div>')
 
       angular.element(document.body).append(pluginDiv)
 

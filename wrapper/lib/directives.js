@@ -2042,4 +2042,48 @@ export function Directives (plugin) {
         }
       }
     }])
+    .directive('znTooltip', [function () {
+      return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
+          let isOpen = false
+
+          element.on('mouseenter', () => {
+            const { top, left, right, bottom } = element.context.getBoundingClientRect()
+            const options = {
+              top,
+              left,
+              bottom,
+              right,
+              message: attrs.znTooltip,
+              side: attrs.tooltipPlacement,
+              delay: Number(attrs.tooltipPopupDelay)
+            }
+
+            plugin.client.call({
+              method: 'openTooltip',
+              args: {
+                options
+              }
+            })
+
+            isOpen = true
+          })
+
+          element.on('mouseleave', () => {
+            isOpen && plugin.client.call({
+              method: 'closeTooltip'
+            })
+
+            isOpen = false
+          })
+
+          element.on('$destroy', () => {
+            isOpen && plugin.client.call({
+              method: 'closeTooltip'
+            })
+          })
+        }
+      }
+    }])
 }
