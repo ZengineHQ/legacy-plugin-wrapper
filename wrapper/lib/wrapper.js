@@ -394,7 +394,7 @@ async function compileProviderIsReady () {
               return deferred.reject(data);
             }
 
-            const { data, status, headers } = result.data;
+            const { data, status, headers } = result;
 
             if (successCb) {
               successCb(data, status, headers);
