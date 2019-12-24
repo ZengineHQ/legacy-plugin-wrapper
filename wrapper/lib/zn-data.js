@@ -9,8 +9,8 @@ export function ZnData (plugin) {
      */
     function unsupportedMethod (method) {
       return function () {
-        throw new Error('Method "' + method + '" is not supported by this resource')
-      }
+        throw new Error('Method "' + method + '" is not supported by this resource');
+      };
     }
 
     const _resources = {
@@ -20,18 +20,18 @@ export function ZnData (plugin) {
       BinaryExportBatch: ['/binary_export_jobs/:binaryExportJobId/batches/:id', 'binaryExportJobId'],
       BinaryExportJob: ['/binary_export_jobs/:id'],
       Calculate: (function () {
-        var _resource = resource('Calculate', '/calculate')
-        var ret = {}
+        var _resource = resource('Calculate', '/calculate');
+        var ret = {};
         // query uses POST to send request to API
         ret.query = function (params, success, error) {
-          return _resource.save({}, params, success, error)
-        }
+          return _resource.save({}, params, success, error);
+        };
         // No other methods supported for this verb endpoint
         for (var method in _resource) {
-          ret[method] = ret[method] || unsupportedMethod(method)
+          ret[method] = ret[method] || unsupportedMethod(method);
         }
 
-        return ret
+        return ret;
       })(),
       CalculationSettings: ['/calculation_settings/:id'],
       DataViews: ['/data_views/:id'],
@@ -102,7 +102,7 @@ export function ZnData (plugin) {
       Organizations: ['/organizations/:id'],
       OrganizationsAuthProviders: ['/organizations/:organizationId/auth_providers/:id'],
       AuthProviders: ['/auth_providers/:id']
-    }
+    };
 
     /**
      * Build a set of resource functions
@@ -112,92 +112,92 @@ export function ZnData (plugin) {
      * @param  object    options - multipart, objectVersion
      */
     function resource (name, path, idField, options) {
-      idField = idField || 'id'
+      idField = idField || 'id';
 
-      const regex = new RegExp(':([a-z]+)', 'ig')
-      const pathParams = path.match(regex)
+      const regex = new RegExp(':([a-z]+)', 'ig');
+      const pathParams = path.match(regex);
 
-      let idRemovedPath = path
+      let idRemovedPath = path;
       if (path.substring(path.length - idField.length - 1) === ':' + idField) {
-        idRemovedPath = path.substring(0, path.length - idField.length - 2)
+        idRemovedPath = path.substring(0, path.length - idField.length - 2);
       }
 
       var save = function (params, data, success, error) {
         if (typeof data === 'function') {
-          error = success
-          success = data
-          data = params
-          params = {}
+          error = success;
+          success = data;
+          data = params;
+          params = {};
         } else if (typeof data === 'undefined') {
-          data = params
-          params = {}
+          data = params;
+          params = {};
         }
 
         // These query params names will be used to check whether or not params as field attributes
         // if true will use `update` action rather then `create`.
-        var updateActionWhitelist = ['timezone', 'limit', 'sort', 'page', 'direction', 'access_token', 'validate_only']
+        var updateActionWhitelist = ['timezone', 'limit', 'sort', 'page', 'direction', 'access_token', 'validate_only'];
 
         // Set whether it's an update or create
-        var method = 'post'
+        var method = 'post';
 
-        var idFieldValue = params[idField] || data[idField]
+        var idFieldValue = params[idField] || data[idField];
 
-        var isMultiIdField = (typeof idFieldValue === 'string' && idFieldValue.indexOf('|') !== -1)
+        var isMultiIdField = (typeof idFieldValue === 'string' && idFieldValue.indexOf('|') !== -1);
 
-        var hasBatchConditions = false
+        var hasBatchConditions = false;
 
         function inPathParams (param) {
-          return pathParams && pathParams.indexOf(':' + param) !== -1
+          return pathParams && pathParams.indexOf(':' + param) !== -1;
         }
 
         if (idFieldValue) {
-          method = 'put'
+          method = 'put';
 
           if (isMultiIdField) {
-            path = idRemovedPath
+            path = idRemovedPath;
           }
         } else {
-          path = idRemovedPath
+          path = idRemovedPath;
 
           if (params) {
             angular.forEach(params, function (value, key) {
               // Ignore param if it's a reserved param or a path param
               if (updateActionWhitelist.indexOf(key) === -1 && !inPathParams(key)) {
-                hasBatchConditions = true
+                hasBatchConditions = true;
               }
-            })
+            });
 
             if (hasBatchConditions) {
-              method = 'put'
+              method = 'put';
             }
           }
         }
 
         // Set whether it's a bulk or single operation
         if (!(angular.isArray(data) || isMultiIdField || hasBatchConditions) && method === 'put' && typeof params[idField] === 'undefined') {
-          params[idField] = data[idField]
+          params[idField] = data[idField];
         }
 
         // Transform multipart form data for file uploads
         if (options && options.multipartKey) {
-          const key = options.multipartKey
+          const key = options.multipartKey;
 
           data.multipart = {
             key: key,
             file: data[key]
-          }
+          };
         }
 
-        const objectVersionField = options && options.objectVersionField ? options.objectVersionField : false  
+        const objectVersionField = options && options.objectVersionField ? options.objectVersionField : false;  
 
-        return request(path, { pathParams, objectVersionField }, method, params, data, success, error)
-      }
+        return request(path, { pathParams, objectVersionField }, method, params, data, success, error);
+      };
 
       return {
         get: request.curry(path, { pathParams }, 'get'),
         query: request.curry(idRemovedPath, { pathParams }, 'get'),
         count: function (params, success, error) {
-          return request(idRemovedPath + '/count', { pathParams }, 'get', params, success, error)
+          return request(idRemovedPath + '/count', { pathParams }, 'get', params, success, error);
         },
         update: request.curry(path, { pathParams }, 'put'),
         updateAll: save,
@@ -205,86 +205,86 @@ export function ZnData (plugin) {
         saveAll: save,
         delete: request.curry(path, { pathParams }, 'delete'),
         deleteAll: function (params, success, error) {
-          return request(idRemovedPath, { pathParams }, 'delete', params, success, error)
+          return request(idRemovedPath, { pathParams }, 'delete', params, success, error);
         },
         del: request.curry(path, { pathParams }, 'delete'),
         remove: request.curry(path, { pathParams }, 'delete')
-      }
+      };
     }
 
     function _flattenObject (ob) {
-      const toReturn = {}
+      const toReturn = {};
 
       for (let i in ob) {
 
         if (!ob[i]) {
-          continue
+          continue;
         }
 
         if ((typeof ob[i]) == 'object') {
           if (ob[i] instanceof Array) {
-            toReturn[i] = ob[i].join(',')
+            toReturn[i] = ob[i].join(',');
           } else {
-            let flatObject = _flattenObject(ob[i])
+            let flatObject = _flattenObject(ob[i]);
             for (let x in flatObject) {
 
               if (!flatObject[x]) {
-                continue
+                continue;
               }
 
-              toReturn[i + '.' + x] = flatObject[x]
+              toReturn[i + '.' + x] = flatObject[x];
             }
           }
         } else {
-          toReturn[i] = ob[i]
+          toReturn[i] = ob[i];
         }
       }
-      return toReturn
+      return toReturn;
     }
 
     function request (path, options, method, params, data, successCb, errorCb) {
-      const { pathParams, objectVersionField } = options
+      const { pathParams, objectVersionField } = options;
 
       if (typeof params === 'function') {
-        errorCb = data
-        successCb = params
-        data = {}
-        params = {}
+        errorCb = data;
+        successCb = params;
+        data = {};
+        params = {};
       } else if (typeof data === 'function') {
-        errorCb = successCb
-        successCb = data
-        data = {}
+        errorCb = successCb;
+        successCb = data;
+        data = {};
       }
 
-      let url = path
+      let url = path;
 
       angular.forEach(pathParams, pathParam => {
-        const param = pathParam.replace(':', '')
+        const param = pathParam.replace(':', '');
         if (params[param] && url.indexOf(pathParam) !== -1) {
-          url = url.replace(pathParam, params[param])
-          delete params[param]
+          url = url.replace(pathParam, params[param]);
+          delete params[param];
         } else {
-          url = url.replace('/' + pathParam, '')
+          url = url.replace('/' + pathParam, '');
         }
-      })
+      });
 
-      const multipart = data ? data.multipart : null
+      const multipart = data ? data.multipart : null;
 
       if (data) {
-        delete data.multipart
+        delete data.multipart;
       }
 
-      const headers = {}
+      const headers = {};
 
       if (method === 'put' && objectVersionField && params[objectVersionField]) {
         // Set currentObjectVersion to be used for headers, and remove from query params
-        headers['X-If-ObjectVersion-Matches'] = params[options.objectVersionField]
-        delete params[objectVersionField]
+        headers['X-If-ObjectVersion-Matches'] = params[options.objectVersionField];
+        delete params[objectVersionField];
       }
-      var deferred = $q.defer()
+      var deferred = $q.defer();
 
       //flatten param object as is done in the original implementation of znData in anglerfish
-      params = _flattenObject(params)
+      params = _flattenObject(params);
 
       const call = () => {
         plugin.client.call({
@@ -302,18 +302,18 @@ export function ZnData (plugin) {
             }
           }
         }).then(result => {
-          const resp = result.data
+          const resp = result.data;
 
-          const isQuery = method === 'get' && Object.keys(params).length
+          const isQuery = method === 'get' && Object.keys(params).length;
 
-          let resourceData = isQuery ? [] : null
+          let resourceData = isQuery ? [] : null;
 
           if (angular.isArray(resp)) {
-            resourceData = JSON.parse(angular.toJson(resp))
+            resourceData = JSON.parse(angular.toJson(resp));
           }
 
           if (resp.data) {
-            resourceData = resp.data
+            resourceData = resp.data;
           }
 
           if (successCb) {
@@ -323,55 +323,55 @@ export function ZnData (plugin) {
               totalCount: resp.totalCount,
               limit: resp.limit,
               offset: resp.offset
-            }, result.headers)
+            }, result.headers);
           }
 
-          deferred.resolve(resourceData)
+          deferred.resolve(resourceData);
         }).catch(err => {
           if (errorCb) {
-            errorCb(err.data)
+            errorCb(err.data);
           }
 
-          deferred.reject(err.data)
-        })
-      }
+          deferred.reject(err.data);
+        });
+      };
 
       if (multipart) {
-        const file = multipart.file
-        const reader = new FileReader()
+        const file = multipart.file;
+        const reader = new FileReader();
 
         reader.onload = () => {
-          const arrayBuffer = reader.result
-          multipart.file = arrayBuffer
-          multipart.name = file.name
-          multipart.type = file.type
-          call()
-        }
+          const arrayBuffer = reader.result;
+          multipart.file = arrayBuffer;
+          multipart.name = file.name;
+          multipart.type = file.type;
+          call();
+        };
 
-        reader.readAsArrayBuffer(file)
+        reader.readAsArrayBuffer(file);
       } else {
-        call()
+        call();
       }
 
-      return deferred.promise
+      return deferred.promise;
     }
 
     return function (name) {
       if (!(name in _resources)) {
-        throw new Error('Resource \'' + name + '\' doesn\'t exist.')
+        throw new Error('Resource \'' + name + '\' doesn\'t exist.');
       }
 
       if (name === 'Calculate') {
-        return _resources[name]
+        return _resources[name];
       }
 
-      var args = _resources[name]
+      var args = _resources[name];
       // add resource name to list of arguments if not already present
       if (args[0] !== name) {
-        args.unshift(name)
+        args.unshift(name);
       }
 
-      return resource.apply(this, args)
-    }
-  }])
+      return resource.apply(this, args);
+    };
+  }]);
 }
