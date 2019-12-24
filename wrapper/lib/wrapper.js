@@ -2,6 +2,7 @@ import '@babel/polyfill';
 import ZnFilterMatcher from 'zn-filter-matcher';
 import Client from '@zenginehq/post-rpc-client';
 import ContentSizer from 'content-sizer';
+import { sanitizeForPostMessage } from './utils'
 
 var plugin = {};
 
@@ -322,7 +323,7 @@ async function compileProviderIsReady () {
             method: name,
             args: {
               payload: {
-                data,
+                data: sanitizeForPostMessage(data),
                 keepOpen
               }
             }
