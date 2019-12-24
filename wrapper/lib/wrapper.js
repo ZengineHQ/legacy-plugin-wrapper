@@ -118,6 +118,7 @@ async function compileProviderIsReady () {
 
       const isModal = context.pluginView.type === 'modal'
       const isInline = context.pluginView.type === 'inline'
+
       if (isModal) {
         currentInterface.template = 'modal-template'
         currentInterface.controller = 'modalCntl'
