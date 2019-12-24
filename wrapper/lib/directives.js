@@ -1,4 +1,4 @@
-import moment from 'moment'
+import moment from 'moment';
 
 export function Directives (plugin) {
   plugin
@@ -10,11 +10,11 @@ export function Directives (plugin) {
           // (to allow for save/cancel buttons)
           $(element).click(function (e) {
             if (!$(e.target).hasClass('dropdown-menu-close')) {
-              e.stopPropagation()
+              e.stopPropagation();
             }
-          })
+          });
         }
-      }
+      };
     }])
     .directive('znFileSelect', ['$parse', function ($parse) {
       return {
@@ -22,28 +22,28 @@ export function Directives (plugin) {
         require: 'ngModel',
         scope: true,
         link: function (scope, el, attrs, ngModel) {
-          var fn = $parse(attrs.znFileSelect)
+          var fn = $parse(attrs.znFileSelect);
 
           // Clear File
           scope.$watch(attrs.ngModel, function (value) {
             if (!value) {
-              el.val(null)
+              el.val(null);
             }
-          }, true)
+          }, true);
 
           // On File Selection, Execute Callback and
           // Update Model Value with the FileList object
           el.bind('change', function () {
-            ngModel.$setViewValue(this.files)
+            ngModel.$setViewValue(this.files);
 
             scope.$apply(function () {
-              fn(scope)
-            })
+              fn(scope);
+            });
 
-            this.value = null
-          })
+            this.value = null;
+          });
         }
-      }
+      };
     }])
     .directive('znDatetimepickerWrapper', ['$rootScope', function ($rootScope) {
       return {
@@ -54,137 +54,137 @@ export function Directives (plugin) {
         controller: ['$scope', '$timeout', function ($scope, $timeout) {
           $scope.dateOptions = {
             'show-weeks': false
-          }
+          };
 
-          $scope.today = new Date()
+          $scope.today = new Date();
 
           // Default Format
-          $scope.format = 'yyyy-MM-dd'
+          $scope.format = 'yyyy-MM-dd';
 
           $scope.open = function ($event) {
-            $event.preventDefault()
-            $event.stopPropagation()
+            $event.preventDefault();
+            $event.stopPropagation();
 
             $timeout(function () {
-              $scope.opened = true
-            })
-          }
+              $scope.opened = true;
+            });
+          };
 
           $rootScope.$watch('user', function (user) {
             if (user && user.settings.dateFormat) {
-              $scope.format = user.settings.dateFormat.replace('mm', 'MM')
-              $scope.user = user
+              $scope.format = user.settings.dateFormat.replace('mm', 'MM');
+              $scope.user = user;
             }
-          })
+          });
         }],
         link: function (scope, element, attrs, ngModelCtrl) {
-          var syncTime = scope.$eval(attrs.syncTime)
-          var apiDateFormat = 'YYYY-MM-DD'
-          var apiDateTimeFormat = 'YYYY-MM-DDTHH:mm:ssZZ'
+          var syncTime = scope.$eval(attrs.syncTime);
+          var apiDateFormat = 'YYYY-MM-DD';
+          var apiDateTimeFormat = 'YYYY-MM-DDTHH:mm:ssZZ';
 
-          var apiFormat = apiDateFormat
-          var datepicker = element.find('[datepicker-popup]')
-          var datepickerNgModelCtrl = datepicker.controller('ngModel')
+          var apiFormat = apiDateFormat;
+          var datepicker = element.find('[datepicker-popup]');
+          var datepickerNgModelCtrl = datepicker.controller('ngModel');
 
-          setApiFormat(syncTime)
+          setApiFormat(syncTime);
 
           scope.$watch(attrs.syncTime, function (val) {
-            setApiFormat(val)
-          })
+            setApiFormat(val);
+          });
 
           function setApiFormat (val) {
             if (val) {
-              apiFormat = apiDateTimeFormat
-              syncTime = true
+              apiFormat = apiDateTimeFormat;
+              syncTime = true;
             } else {
-              apiFormat = apiDateFormat
-              syncTime = false
+              apiFormat = apiDateFormat;
+              syncTime = false;
             }
           }
 
           function setValue (value) {
             if (value != ngModelCtrl.$modelValue) {
-              ngModelCtrl.$setViewValue(value)
+              ngModelCtrl.$setViewValue(value);
             }
           }
 
           function parse (value, strict) {
             if (!value) {
-              return value
+              return value;
             }
 
             if (typeof value === 'object' &&
               value.constructor.name === 'Date') { // valid Date object
-              var apiDate = moment(scope.date)
+              var apiDate = moment(scope.date);
 
               if (syncTime && moment(scope.time).isValid()) {
-                var apiTime = moment(scope.time)
+                var apiTime = moment(scope.time);
 
-                apiDate.hour(apiTime.hour())
-                apiDate.minute(apiTime.minute())
-                apiDate.second(0)
+                apiDate.hour(apiTime.hour());
+                apiDate.minute(apiTime.minute());
+                apiDate.second(0);
               }
 
-              value = apiDate.format(apiFormat)
+              value = apiDate.format(apiFormat);
             } else { // manually typed string
-              var userFormat = scope.format.toUpperCase()
-              var parsedDate = moment(value, userFormat, strict)
+              var userFormat = scope.format.toUpperCase();
+              var parsedDate = moment(value, userFormat, strict);
 
               if (parsedDate.isValid()) {
-                value = parsedDate.format(apiFormat)
+                value = parsedDate.format(apiFormat);
               }
             }
 
-            return value
+            return value;
           }
 
           // Take User Data, Convert it to Model Data
           ngModelCtrl.$parsers.unshift(function (value) {
-            return parse(value, true)
-          })
+            return parse(value, true);
+          });
 
           // Take Model Data, Convert it to View Data
           ngModelCtrl.$formatters.push(function (value) {
-            var result
+            var result;
 
             if (value) {
-              var mDate = moment(value, apiFormat, true)
+              var mDate = moment(value, apiFormat, true);
 
               if (mDate.isValid()) {
-                result = mDate.toDate()
+                result = mDate.toDate();
               }
             }
 
-            return result
-          })
+            return result;
+          });
 
           // Update Directive Data
           ngModelCtrl.$render = function () {
-            var value = ngModelCtrl.$viewValue
+            var value = ngModelCtrl.$viewValue;
 
-            scope.date = value
-            scope.time = value
-          }
+            scope.date = value;
+            scope.time = value;
+          };
 
           scope.$watch(function () {
-            return datepickerNgModelCtrl.$viewValue
+            return datepickerNgModelCtrl.$viewValue;
           }, function (value) {
             // Pass Along Date Validation to Directive
-            ngModelCtrl.$setValidity('date', datepickerNgModelCtrl.$valid)
+            ngModelCtrl.$setValidity('date', datepickerNgModelCtrl.$valid);
 
-            value = parse(value, true)
+            value = parse(value, true);
 
-            setValue(value)
-          })
+            setValue(value);
+          });
 
           if (syncTime) {
             scope.$watch('time', function (time) {
-              time = parse(time, true)
-              setValue(time)
-            })
+              time = parse(time, true);
+              setValue(time);
+            });
           }
         }
-      }
+      };
     }])
     .directive('esc', ['$rootScope', function ($rootScope) {
       return {
@@ -193,113 +193,113 @@ export function Directives (plugin) {
           $(element).keydown(function (evt) {
             if (evt.which === 27) {
               $rootScope.$apply(function () {
-                $rootScope.$broadcast('esc')
-              })
+                $rootScope.$broadcast('esc');
+              });
             }
-          })
+          });
         }
-      }
+      };
     }])
     .directive('validate', [function () {
       return {
         restrict: 'A',
         link: function (scope, element, attrs) {
-          var parents = $(element).parents('form[name]')
-          var controlNames = attrs.validate.split(',')
-          var form
-          var controls = []
+          var parents = $(element).parents('form[name]');
+          var controlNames = attrs.validate.split(',');
+          var form;
+          var controls = [];
 
           function evaluate (submitted) {
-            var valid = true
+            var valid = true;
 
             if (submitted) {
               angular.forEach(controls, function (control) {
-                valid = valid && control.$valid
-              })
+                valid = valid && control.$valid;
+              });
             }
 
-            element[valid ? 'removeClass' : 'addClass']('error')
+            element[valid ? 'removeClass' : 'addClass']('error');
           }
 
           if (parents.length) {
-            var formName = parents.first().attr('name')
+            var formName = parents.first().attr('name');
 
             if (formName && scope[formName]) {
-              form = scope[formName]
+              form = scope[formName];
 
               angular.forEach(controlNames, function (controlName) {
                 if (controlName in form) {
-                  controls.push(form[controlName])
+                  controls.push(form[controlName]);
 
                   scope.$watch(formName + '.' + controlName + '.$valid', function () {
-                    evaluate(form.submitted)
-                  })
+                    evaluate(form.submitted);
+                  });
 
                   $('[name=' + controlName + ']', element).change(function () {
-                    $(this).trigger('input')
-                  })
+                    $(this).trigger('input');
+                  });
                 }
-              })
+              });
 
               scope.$watch(formName + '.submitted', function (submitted) {
-                evaluate(submitted)
-              })
+                evaluate(submitted);
+              });
             }
           }
         }
-      }
+      };
     }])
     .directive('formError', [function () {
       return {
         restrict: 'A',
         scope: false,
         link: function (scope, element, attrs) {
-          var name = attrs.name
+          var name = attrs.name;
 
           function serializeError (error) {
-            var errorMessages = {}
-            var p, x
+            var errorMessages = {};
+            var p, x;
             for (var i in error) {
               if (Object.prototype.hasOwnProperty.call(error, i)) {
                 if (!angular.isObject(error[i]) || angular.isArray(error[i])) {
-                  errorMessages[i] = error[i]
+                  errorMessages[i] = error[i];
                 } else {
-                  p = serializeError(error[i])
+                  p = serializeError(error[i]);
                   for (x in p) {
                     if (Object.prototype.hasOwnProperty.call(p, x)) {
-                      errorMessages[i + '.' + x] = p[x]
+                      errorMessages[i + '.' + x] = p[x];
                     }
                   }
                 }
               }
             }
-            return errorMessages
+            return errorMessages;
           }
 
           scope.$watch(name, function (form) {
             if (!form) {
-              return
+              return;
             }
 
             scope.$watch(name + '.errorObject', function (error) {
               if (!error) {
-                return
+                return;
               }
 
-              var errors = serializeError(error)
+              var errors = serializeError(error);
 
-              form.submitted = true
+              form.submitted = true;
 
               var remove = function (path, initialValue, errorContainer) {
                 var unwatcher = scope.$watch(path, function (value) {
                   if (initialValue !== value) {
                     // Change has been made so clear server validation error
-                    field.$setValidity('server-validation', true)
-                    errorContainer.remove()
-                    unwatcher()
+                    field.$setValidity('server-validation', true);
+                    errorContainer.remove();
+                    unwatcher();
                   }
-                })
-              }
+                });
+              };
 
               // Variable path is the path of the error (same thing you would set as ng-model)
               // Variable x is the content of the error
@@ -307,40 +307,40 @@ export function Directives (plugin) {
               for (var path in errors) {
                 if (Object.prototype.hasOwnProperty.call(errors, path)) {
                   var x, field, fieldElement, fieldContainer,
-                    fieldName, errorContainer, controls
+                    fieldName, errorContainer, controls;
 
-                  x = (errors[path] && errors[path].join && errors[path].join('')) || errors[path]
+                  x = (errors[path] && errors[path].join && errors[path].join('')) || errors[path];
 
                   // Get the field
-                  fieldElement = $(element).find('[ng-model="' + path + '"]')
-                  fieldName = fieldElement.attr('name')
-                  fieldContainer = fieldElement.closest('[validate="' + fieldName + '"]')
-                  field = form[fieldName]
+                  fieldElement = $(element).find('[ng-model="' + path + '"]');
+                  fieldName = fieldElement.attr('name');
+                  fieldContainer = fieldElement.closest('[validate="' + fieldName + '"]');
+                  field = form[fieldName];
 
                   if (!field) {
                     // No field for this error, skip to prevent errors
-                    continue
+                    continue;
                   }
 
                   // Set the field as problematic
-                  field.$setValidity('server-validation', false)
+                  field.$setValidity('server-validation', false);
 
-                  fieldContainer.addClass('error')
-                  errorContainer = $('<div>').addClass('form-error error help-block').text(x)
-                  controls = fieldContainer.find('.controls')
+                  fieldContainer.addClass('error');
+                  errorContainer = $('<div>').addClass('form-error error help-block').text(x);
+                  controls = fieldContainer.find('.controls');
 
                   if (!controls.length) {
-                    controls = fieldContainer
+                    controls = fieldContainer;
                   }
 
-                  controls.append(errorContainer)
-                  remove(path, field.$modelValue, errorContainer)
+                  controls.append(errorContainer);
+                  remove(path, field.$modelValue, errorContainer);
                 }
               }
-            })
-          })
+            });
+          });
         }
-      }
+      };
     }])
     .directive('modal', ['znModal', function (modal) {
       return {
@@ -348,18 +348,18 @@ export function Directives (plugin) {
         replace: false,
         link: function (scope, element, attrs) {
           if (!attrs.href && !attrs.modal) {
-            return
+            return;
           }
           element.bind('click', function (e) {
-            e.preventDefault()
+            e.preventDefault();
             modal({
               title: attrs.title || '',
               templateUrl: attrs.href || attrs.modal,
               classes: attrs.modalclass || ''
-            })
-          })
+            });
+          });
         }
-      }
+      };
     }])
     /**
      * Draggable Wrapper Directive
@@ -371,13 +371,13 @@ export function Directives (plugin) {
         link: function (scope, elem, attrs) {
           scope.$watch(attrs.uiDraggable, function (newVal) {
             angular.forEach(newVal, function (value, key) {
-              elem.draggable('option', key, value)
-            })
-          }, true)
+              elem.draggable('option', key, value);
+            });
+          }, true);
 
-          elem.draggable()
+          elem.draggable();
         }
-      }
+      };
     }])
     /**
      * checkList directive - allow multi value checkboxes to with with ng-model
@@ -395,71 +395,71 @@ export function Directives (plugin) {
           var handler = function (setup) {
             if (setup) {
               if (!angular.isArray(scope.list)) {
-                var value
+                var value;
                 if (scope.list) {
                   if (scope.list.id) {
                     // old member field value is
                     // still in single response format {id: 2, 'name': anna}
                     // and was converted from dropdown to checklist.
-                    value = parseInt(scope.list.id, 10)
+                    value = parseInt(scope.list.id, 10);
                   } else {
                     // single checkbox value came back as string
-                    value = scope.list
+                    value = scope.list;
                   }
                 }
-                scope.list = []
+                scope.list = [];
                 if (value) {
-                  scope.list.push(value)
+                  scope.list.push(value);
                 }
               } else {
                 var map = scope.list.map(
                   function (obj) {
                     if (typeof obj === 'object' && obj.id) {
-                      return obj.id.toString()
+                      return obj.id.toString();
                     } else {
-                      return obj
+                      return obj;
                     }
                   }
-                )
-                scope.list = map
+                );
+                scope.list = map;
               }
             }
-            var checked = elem.prop('checked')
+            var checked = elem.prop('checked');
 
-            var checkValue
+            var checkValue;
 
             if (scope.checkValue) {
-              checkValue = scope.checkValue.toString()
+              checkValue = scope.checkValue.toString();
             } else {
-              checkValue = attrs.checkValue
+              checkValue = attrs.checkValue;
             }
 
-            var index = scope.list.indexOf(checkValue)
+            var index = scope.list.indexOf(checkValue);
 
             if (checked && index == -1) {
               if (setup) {
-                elem.prop('checked', false)
+                elem.prop('checked', false);
               } else {
-                scope.list.push(checkValue)
+                scope.list.push(checkValue);
               }
             } else if (!checked && index != -1) {
               if (setup) {
-                elem.prop('checked', true)
+                elem.prop('checked', true);
               } else {
-                scope.list.splice(index, 1)
+                scope.list.splice(index, 1);
               }
             }
-          }
+          };
 
-          var setupHandler = handler.bind(null, true)
-          var changeHandler = handler.bind(null, false)
+          var setupHandler = handler.bind(null, true);
+          var changeHandler = handler.bind(null, false);
 
           elem.bind('change', function () {
-            scope.$apply(changeHandler)
-          })
-          scope.$watch('list', setupHandler, true)
+            scope.$apply(changeHandler);
+          });
+          scope.$watch('list', setupHandler, true);
         }
-      }
+      };
     }])
     /**
      * Auto Expanding Textarea
@@ -473,52 +473,52 @@ export function Directives (plugin) {
         require: 'ngModel',
         link: function ($scope, elem, attrs, ngModelCtrl) {
           var lockHeight = function (element) {
-            element.css('height', element.height())
-          }
+            element.css('height', element.height());
+          };
 
           var unlockHeight = function (element) {
-            element.css('height', 'auto')
-          }
+            element.css('height', 'auto');
+          };
 
           var changeToIdealHeight = function (element) {
-            $(element).height(0)
-            var height = $(element)[0].scrollHeight
+            $(element).height(0);
+            var height = $(element)[0].scrollHeight;
 
             // 8 is for the padding
             if (height < 20) {
-              height = 28
+              height = 28;
             }
-            $(element).height(height - 8)
-          }
+            $(element).height(height - 8);
+          };
 
           elem.bind('keyup', function ($event) {
-            var element = $event.target
-            var parent = $(element).parent()
+            var element = $event.target;
+            var parent = $(element).parent();
 
             // Lock parent's height
             // to prevent a quick shrinking and expanding glitch
             // that happens when the text area is at a considerable size (WIZ-3363)
-            lockHeight(parent)
+            lockHeight(parent);
 
-            changeToIdealHeight(element)
+            changeToIdealHeight(element);
 
             // Now that the element has shrinked or expanded
             // We can unlock the parent's height (WIZ-3363)
-            unlockHeight(parent)
-          })
+            unlockHeight(parent);
+          });
 
           // Expand the textarea as soon as it is added to the DOM
           $timeout(function () {
-            changeToIdealHeight(elem)
-          }, 0)
+            changeToIdealHeight(elem);
+          }, 0);
 
           $scope.$watch(function () {
-            return ngModelCtrl.$viewValue
+            return ngModelCtrl.$viewValue;
           }, function () {
-            changeToIdealHeight(elem)
-          })
+            changeToIdealHeight(elem);
+          });
         }
-      }
+      };
       /**
        * Height match widget
        *
@@ -544,39 +544,39 @@ export function Directives (plugin) {
         link: function (scope, element, attr, ngModel) {
           ngModel.$parsers.push(function (input) {
             if (!input) {
-              return ''
+              return '';
             }
 
             // Toggle Negative Value
             function toggleNegativeValue (value) {
-              const numNegatives = value.length - value.replace(/-/g, '').length
+              const numNegatives = value.length - value.replace(/-/g, '').length;
 
               if (numNegatives > 1 || value.indexOf('-') !== 0) {
-                value = value.replace(/-/g, '')
+                value = value.replace(/-/g, '');
 
                 if (numNegatives % 2 !== 0) {
                   // Prepend Negative
-                  value = '-' + value
+                  value = '-' + value;
                 }
               }
 
-              return value
+              return value;
             }
 
-            var matches = input.match(/^[-\d]+\.?[-\d]*/)
-            var newValue = (matches && matches.length && matches[0]) || ''
+            var matches = input.match(/^[-\d]+\.?[-\d]*/);
+            var newValue = (matches && matches.length && matches[0]) || '';
 
-            newValue = toggleNegativeValue(newValue)
+            newValue = toggleNegativeValue(newValue);
 
             if (newValue !== input) {
-              ngModel.$setViewValue(newValue)
-              ngModel.$render()
+              ngModel.$setViewValue(newValue);
+              ngModel.$render();
             }
 
-            return newValue
-          })
+            return newValue;
+          });
         }
-      }
+      };
     }])
     .directive('znFormSelect', [function () {
       return {
@@ -590,42 +590,42 @@ export function Directives (plugin) {
         },
         templateUrl: '/templates/partials/form-select/form-select.html',
         link: function (scope, element, attr) {
-          scope.form = {}
+          scope.form = {};
 
           scope.$watch('ngDisabled', function (ngDisabled) {
-            scope.disabled = (!ngDisabled && !Object.prototype.hasOwnProperty.call(attr, 'ngDisabled')) ? false : ngDisabled || true
-          })
+            scope.disabled = (!ngDisabled && !Object.prototype.hasOwnProperty.call(attr, 'ngDisabled')) ? false : ngDisabled || true;
+          });
 
           // update zn-form-select ngModel
           scope.$watch('form.selected', function (selected) {
-            var value
+            var value;
             if (selected) {
-              value = scope.formProperty ? selected[scope.formProperty] : selected
+              value = scope.formProperty ? selected[scope.formProperty] : selected;
             }
             if (value) {
-              scope.ngModel = value
-              scope.ngChange()
+              scope.ngModel = value;
+              scope.ngChange();
             }
-          })
+          });
 
           // update ui-select ngModel
           scope.$watch('ngModel', function (ngModel) {
-            var value
+            var value;
             if (ngModel && scope.formProperty) {
               angular.forEach(scope.forms, function (form) {
                 if (form[scope.formProperty] == ngModel) {
-                  value = angular.copy(form)
+                  value = angular.copy(form);
                 }
-              })
+              });
             } else if (ngModel) {
-              value = ngModel
+              value = ngModel;
             }
             if (value) {
-              scope.form.selected = value
+              scope.form.selected = value;
             }
-          })
+          });
         }
-      }
+      };
     }])
     .directive('znInlineFilter', ['RecursionHelper', 'filterDefinition', 'inlineFilter', function (RecursionHelper, filterDefinition, inlineFilter) {
       return {
@@ -643,69 +643,69 @@ export function Directives (plugin) {
           var link = {
             post: function (scope, element, attrs, ngModelCtrl) {
               scope.operator = null,
-                scope.conditions = []
+                scope.conditions = [];
 
               function getOperators () {
-                return scope.options.operators || inlineFilter.operators
+                return scope.options.operators || inlineFilter.operators;
               }
 
               function getDefaultOperator () {
-                return inlineFilter.getDefaultOperator(getOperators())
+                return inlineFilter.getDefaultOperator(getOperators());
               }
 
               // Convert Model Value to View Value
               ngModelCtrl.$formatters.push(function (modelValue) {
-                var filter = filterDefinition(modelValue)
+                var filter = filterDefinition(modelValue);
 
                 if (!filter.getOperator()) {
-                  filter.setOperator(getDefaultOperator())
+                  filter.setOperator(getDefaultOperator());
                 }
 
                 if (!filter.getConditions()) {
-                  filter.setConditions([])
+                  filter.setConditions([]);
                 }
 
-                return filter
-              })
+                return filter;
+              });
 
               // Convert View Value to Model Value
               ngModelCtrl.$parsers.push(function (viewValue) {
                 // Update model without breaking prototypal inheritance
                 angular.forEach(Object.keys(ngModelCtrl.$modelValue), function (key) {
-                  delete ngModelCtrl.$modelValue[key]
-                })
-                return angular.extend(ngModelCtrl.$modelValue, viewValue.getFilter())
-              })
+                  delete ngModelCtrl.$modelValue[key];
+                });
+                return angular.extend(ngModelCtrl.$modelValue, viewValue.getFilter());
+              });
 
               // Render Filter to Scope Variables
               ngModelCtrl.$render = function () {
-                scope.operator = ngModelCtrl.$viewValue.getOperator()
-                scope.conditions = ngModelCtrl.$viewValue.getConditions()
-              }
+                scope.operator = ngModelCtrl.$viewValue.getOperator();
+                scope.conditions = ngModelCtrl.$viewValue.getConditions();
+              };
 
               function watchFilter () {
-                var filter = filterDefinition()
-                filter.setOperator(scope.operator)
-                filter.setConditions(scope.conditions)
+                var filter = filterDefinition();
+                filter.setOperator(scope.operator);
+                filter.setConditions(scope.conditions);
 
-                ngModelCtrl.$setViewValue(filter)
+                ngModelCtrl.$setViewValue(filter);
               }
 
               // Update View Value
-              scope.$watch('operator', watchFilter)
+              scope.$watch('operator', watchFilter);
 
               // Update View Value
-              scope.$watch('conditions', watchFilter, true)
+              scope.$watch('conditions', watchFilter, true);
             }
-          }
+          };
 
           // Use the compile function from the RecursionHelper,
           // And return the linking function(s) which it returns
-          return RecursionHelper.compile(element, link)
+          return RecursionHelper.compile(element, link);
         },
         controller: 'inlineFilterCntl',
         templateUrl: '/templates/partials/inline-filter.html'
-      }
+      };
     }])
     .controller('inlineFilterCntl', ['$scope', '$rootScope', 'inlineFilter', 'filterDefinition', 'filterWorkspace', 'validateFilterOptions',
       function ($scope, $rootScope, inlineFilter, filterDefinition, filterWorkspace, validateFilterOptions) {
@@ -720,19 +720,19 @@ export function Directives (plugin) {
           prefixBlacklist: [],
           attributeBlacklist: [],
           fieldTypeBlacklist: []
-        }
+        };
 
         if (!$scope.options) {
-          $scope.options = {}
+          $scope.options = {};
         }
 
         angular.forEach(defaultOptions, function (value, option) {
           if (!Object.prototype.hasOwnProperty.call($scope.options, option)) {
-            $scope.options[option] = value
+            $scope.options[option] = value;
           }
-        })
+        });
 
-        $scope.options.fieldTypeBlacklist = inlineFilter.combineFieldTypeBlacklist($scope.options.fieldTypeBlacklist)
+        $scope.options.fieldTypeBlacklist = inlineFilter.combineFieldTypeBlacklist($scope.options.fieldTypeBlacklist);
 
         // Default Scope
         $scope = angular.extend($scope, {
@@ -744,38 +744,38 @@ export function Directives (plugin) {
           operatorConditionLabel: '',
           subOptions: $scope.options,
           addFilterSelector: ''
-        })
+        });
 
         $scope.emptyCondition = {
           prefix: '',
           attribute: '',
           value: ''
-        }
+        };
 
         $rootScope.$watch('constants', function (constants) {
           if (constants) {
-            $scope.constants = constants
+            $scope.constants = constants;
           }
-        })
+        });
 
         // Current Condition Level
-        $scope.level = $scope.level || 1
-        $scope.level = parseInt($scope.level, 10)
+        $scope.level = $scope.level || 1;
+        $scope.level = parseInt($scope.level, 10);
 
         // Top Level Counts
         if ($scope.level == 1) {
           $scope.counts = {
             conditionCount: 0,
             dynamicCount: 0
-          }
+          };
         }
 
         // Next Condition Level
-        $scope.nextLevel = $scope.level + 1
+        $scope.nextLevel = $scope.level + 1;
 
         // Operator Options
         if (!$scope.operatorOptions) {
-          $scope.operatorOptions = inlineFilter.getOperatorOptions($scope.options.operators)
+          $scope.operatorOptions = inlineFilter.getOperatorOptions($scope.options.operators);
         }
 
         // Record Attributes
@@ -818,7 +818,7 @@ export function Directives (plugin) {
             name: 'Draft',
             attributeOrder: 6
           }
-        ]
+        ];
 
         // Prefix Options
         var prefixOptions = [
@@ -895,17 +895,17 @@ export function Directives (plugin) {
             label: 'does not validate',
             type: 'Validation'
           }
-        ]
+        ];
 
-        $scope.prefixOptions = []
+        $scope.prefixOptions = [];
 
         angular.forEach(prefixOptions, function (option) {
           if (skipBlacklistedPrefix(option.prefix)) {
-            return
+            return;
           }
 
-          $scope.prefixOptions.push(option)
-        })
+          $scope.prefixOptions.push(option);
+        });
 
         /**
        * Track condition - tracking function for ng-repeat. This lets us track distinct conditions without depending on $index, which
@@ -915,13 +915,13 @@ export function Directives (plugin) {
        * @author	Paul W. Smith <paul@wizehive.com>
        * @since	0.5.76
        */
-        var trackedConditions = []
+        var trackedConditions = [];
         $scope.trackCondition = function (condition) {
           if (trackedConditions.indexOf(condition) === -1) {
-            trackedConditions.push(condition)
+            trackedConditions.push(condition);
           }
-          return trackedConditions.indexOf(condition)
-        }
+          return trackedConditions.indexOf(condition);
+        };
 
         /**
        * Sort conditions - so multiple conditions on the same attribute are displayed together
@@ -935,56 +935,56 @@ export function Directives (plugin) {
               if (!cond1.attribute && !cond2.attribute) {
                 // sort AND before OR groups
                 if (cond1.and) {
-                  return -1
+                  return -1;
                 }
 
-                return 1
+                return 1;
               }
 
               // put grouped conditions at the bottom
               if (!cond1.attribute) {
-                return 1
+                return 1;
               }
 
               if (!cond2.attribute) {
-                return -1
+                return -1;
               }
 
               // Attribute is Missing/Deleted
               if (!$scope.attributeOptions[cond1.attribute]) {
-                return 1
+                return 1;
               }
 
               // Attribute is Missing/Deleted
               if (!$scope.attributeOptions[cond2.attribute]) {
-                return -1
+                return -1;
               }
 
-              var attributeOption1 = $scope.attributeOptions[cond1.attribute]
-              var attributeOption2 = $scope.attributeOptions[cond2.attribute]
-              var order1 = attributeOption1.order
-              var order2 = attributeOption2.order
+              var attributeOption1 = $scope.attributeOptions[cond1.attribute];
+              var attributeOption2 = $scope.attributeOptions[cond2.attribute];
+              var order1 = attributeOption1.order;
+              var order2 = attributeOption2.order;
 
               // sort by record attribute order
               if (order1 === undefined && order2 === undefined) {
-                return attributeOption1.attributeOrder - attributeOption2.attributeOrder
+                return attributeOption1.attributeOrder - attributeOption2.attributeOrder;
               }
 
               // record attributes come before field attributes
               if (order1 === undefined) {
-                return -1
+                return -1;
               }
 
               if (order2 === undefined) {
-                return 1
+                return 1;
               }
 
               // sort by field order
-              return order1 - order2
-            })
+              return order1 - order2;
+            });
           }
 
-          return conditions
+          return conditions;
         }
 
         /**
@@ -1000,10 +1000,10 @@ export function Directives (plugin) {
             users.unshift({
               id: 'logged-in-user',
               displayName: 'Logged In User'
-            })
+            });
           }
 
-          return users
+          return users;
         }
 
         /**
@@ -1012,48 +1012,48 @@ export function Directives (plugin) {
         function setRecordAttributes () {
           angular.forEach($scope.recordAttributes, function (attribute) {
             if (!attribute.type) {
-              attribute.type = attribute.attribute
+              attribute.type = attribute.attribute;
             }
 
-            pushAttribute(attribute)
-          })
+            pushAttribute(attribute);
+          });
         }
 
         function getWorkspace (skipCache) {
           if (!$scope.options.formId && !$scope.options.workspaceId) {
-            return
+            return;
           }
 
           return filterWorkspace.getWorkspace($scope.options, skipCache)
             .then(setFormsAndUsers)
             .then(function () {
-              $scope.attributesLoaded = true
-            })
+              $scope.attributesLoaded = true;
+            });
         }
 
         /**
        * Set Forms and Users
        */
         function setFormsAndUsers (workspace) {
-          $scope.users = getWorkspaceUsers(workspace.users)
-          $scope.forms = workspace.forms
+          $scope.users = getWorkspaceUsers(workspace.users);
+          $scope.forms = workspace.forms;
 
           if ($scope.model) {
-            validateFilterOptions($scope.model, $scope.options, $scope.forms)
+            validateFilterOptions($scope.model, $scope.options, $scope.forms);
           }
 
           if ($scope.options.formId) {
             // Specific Form
-            $scope.form = workspace.forms[$scope.options.formId]
+            $scope.form = workspace.forms[$scope.options.formId];
 
             // Field Attributes
-            setFormFieldAttributes($scope.form.fields)
+            setFormFieldAttributes($scope.form.fields);
 
             // Adds hasOne relations
-            setFormLinkedFormAttributes($scope.form.linkedForms)
+            setFormLinkedFormAttributes($scope.form.linkedForms);
           }
 
-          return true
+          return true;
         }
 
         /**
@@ -1066,16 +1066,16 @@ export function Directives (plugin) {
         function setFormFieldAttributes (fields) {
           angular.forEach(fields, function (field) {
             if (skipBlacklistedFieldType(field.type)) {
-              return
+              return;
             }
 
             var attribute = angular.extend({}, field, {
               attribute: 'field' + field.id,
               name: field.name || field.label
-            })
+            });
 
-            pushAttribute(attribute)
-          })
+            pushAttribute(attribute);
+          });
         }
 
         /**
@@ -1086,7 +1086,7 @@ export function Directives (plugin) {
        */
         function setFormLinkedFormAttributes (linkedForms) {
           if (!$scope.options.subfilters) {
-            return
+            return;
           }
 
           angular.forEach(linkedForms, function (form) {
@@ -1099,11 +1099,11 @@ export function Directives (plugin) {
                 attribute: 'form' + form.form.id,
                 name: $scope.forms[form.form.id].name,
                 type: 'linked'
-              }
+              };
 
-              pushAttribute(attribute)
+              pushAttribute(attribute);
             }
-          })
+          });
         }
 
         /**
@@ -1115,7 +1115,7 @@ export function Directives (plugin) {
        * @returns	{boolean}
        */
         function skipBlacklistedFieldType (type) {
-          return $scope.options.fieldTypeBlacklist.indexOf(type) !== -1
+          return $scope.options.fieldTypeBlacklist.indexOf(type) !== -1;
         }
 
         /**
@@ -1127,7 +1127,7 @@ export function Directives (plugin) {
        * @returns	{boolean}
        */
         function skipBlacklistedAttribute (attribute) {
-          return $scope.options.attributeBlacklist.indexOf(attribute) !== -1
+          return $scope.options.attributeBlacklist.indexOf(attribute) !== -1;
         }
 
         /**
@@ -1139,7 +1139,7 @@ export function Directives (plugin) {
        * @returns	{boolean}
        */
         function skipBlacklistedPrefix (prefix) {
-          return $scope.options.prefixBlacklist.indexOf(prefix) !== -1
+          return $scope.options.prefixBlacklist.indexOf(prefix) !== -1;
         }
 
         /**
@@ -1151,11 +1151,11 @@ export function Directives (plugin) {
        */
         function pushAttribute (attribute) {
           if (skipBlacklistedAttribute(attribute.attribute)) {
-            return
+            return;
           }
 
-          $scope.attributeOptions[attribute.attribute] = attribute
-          $scope.sortedAttributes.push(attribute)
+          $scope.attributeOptions[attribute.attribute] = attribute;
+          $scope.sortedAttributes.push(attribute);
         }
 
         // Unused
@@ -1185,7 +1185,7 @@ export function Directives (plugin) {
        */
         function setOperator (operator) {
           if (operator) {
-            setOperatorConditionLabel(operator)
+            setOperatorConditionLabel(operator);
           }
         }
 
@@ -1198,13 +1198,13 @@ export function Directives (plugin) {
        * @returns	{object}
        */
         function operatorOption (operator) {
-          var found = null
+          var found = null;
           angular.forEach($scope.operatorOptions, function (option) {
             if (option.operator == operator) {
-              found = option
+              found = option;
             }
-          })
-          return found
+          });
+          return found;
         }
 
         /**
@@ -1215,9 +1215,9 @@ export function Directives (plugin) {
        * @param	{string}	operator
        */
         function setOperatorConditionLabel (operator) {
-          var option = operatorOption(operator)
+          var option = operatorOption(operator);
 
-          $scope.operatorConditionLabel = option.conditionLabel
+          $scope.operatorConditionLabel = option.conditionLabel;
         }
 
         /**
@@ -1228,7 +1228,7 @@ export function Directives (plugin) {
        * @param	{object}	condition
        */
         function addCondition (condition) {
-          $scope.conditions.push(condition)
+          $scope.conditions.push(condition);
         }
 
         /**
@@ -1240,20 +1240,20 @@ export function Directives (plugin) {
        */
         function getConditionCount () {
           if ($scope.operator && $scope.conditions && $scope.conditions.length) {
-            var filter = filterDefinition()
-            filter.setOperator($scope.operator)
-            filter.setConditions($scope.conditions)
+            var filter = filterDefinition();
+            filter.setOperator($scope.operator);
+            filter.setConditions($scope.conditions);
 
-            return filter.getConditionCount()
+            return filter.getConditionCount();
           }
 
-          return 0
+          return 0;
         }
 
         function setConditionCount (count) {
           if ($scope.counts) {
-            count = count || getConditionCount()
-            $scope.counts.conditionCount = count
+            count = count || getConditionCount();
+            $scope.counts.conditionCount = count;
           }
         }
 
@@ -1265,8 +1265,8 @@ export function Directives (plugin) {
        * @returns	{boolean}
        */
         $scope.showAddSubGroup = function () {
-          return $scope.options.groups && ($scope.level < 5)
-        }
+          return $scope.options.groups && ($scope.level < 5);
+        };
 
         /**
        * Show Add Condition
@@ -1276,8 +1276,8 @@ export function Directives (plugin) {
        * @returns	{boolean}
        */
         $scope.showAddCondition = function () {
-          return $scope.counts.conditionCount < 10
-        }
+          return $scope.counts.conditionCount < 10;
+        };
 
         /**
        * Add Attribute Condition
@@ -1287,10 +1287,10 @@ export function Directives (plugin) {
        * @param	{object}	attribute
        */
         $scope.addAttributeCondition = function (attribute) {
-          var condition = inlineFilter.getEmptyCondition(attribute)
-          $scope.counts.conditionCount++
-          addCondition(condition)
-        }
+          var condition = inlineFilter.getEmptyCondition(attribute);
+          $scope.counts.conditionCount++;
+          addCondition(condition);
+        };
 
         /**
        * Add Sub Filter Condition
@@ -1300,12 +1300,12 @@ export function Directives (plugin) {
        * @param	{object}	attribute
        */
         $scope.addSubCondition = function (operator) {
-          var subfilter = inlineFilter.getEmptyFilter(operator)
-          subfilter = inlineFilter.mergeConditions(subfilter, [inlineFilter.getEmptyCondition()])
+          var subfilter = inlineFilter.getEmptyFilter(operator);
+          subfilter = inlineFilter.mergeConditions(subfilter, [inlineFilter.getEmptyCondition()]);
 
-          $scope.counts.conditionCount++
-          addCondition(subfilter)
-        }
+          $scope.counts.conditionCount++;
+          addCondition(subfilter);
+        };
 
         /**
        * Remove Condition
@@ -1315,19 +1315,19 @@ export function Directives (plugin) {
        * @param	{int}	index
        */
         $scope.removeCondition = function (index) {
-          $scope.conditions.splice(index, 1)
+          $scope.conditions.splice(index, 1);
 
           // Empty Conditions
           if (!$scope.conditions.length) {
             if ($scope.level === 1) {
               // Top Level, Reset Default Condition
-              $scope.addAttributeCondition()
+              $scope.addAttributeCondition();
             } else {
               // Nested Condition, Remove from Parent
-              $scope.removeParentCondition()
+              $scope.removeParentCondition();
             }
           }
-        }
+        };
 
         /**
        * Watch Filter Model
@@ -1340,45 +1340,45 @@ export function Directives (plugin) {
           if (allSet) {
             // Empty Conditions
             if (!$scope.conditions.length) {
-              $scope.conditions = $scope.conditions.concat([inlineFilter.getEmptyCondition()])
+              $scope.conditions = $scope.conditions.concat([inlineFilter.getEmptyCondition()]);
             }
 
             setAttributes(false).then(function () {
-              $scope.conditions = sortConditions($scope.conditions)
+              $scope.conditions = sortConditions($scope.conditions);
 
               // Initial Condition Count
               if ($scope.level === 1) {
-                setConditionCount()
+                setConditionCount();
               }
-            })
+            });
           }
-        })
+        });
 
         /**
        * Watch Options
        */
         $scope.$watch('options', function (options, oldOptions) {
           if (!options || angular.equals(options, oldOptions)) {
-            return
+            return;
           }
 
           // Reset Attributes if Options Change
-          setAttributes(false)
-        }, true)
+          setAttributes(false);
+        }, true);
 
         /**
        * Watch form fields updates
        */
         $scope.$on('form-fields-saved', function () {
-          setAttributes(true)
-        })
+          setAttributes(true);
+        });
 
         function setAttributes (skipCache) {
-          $scope.attributesLoaded = false
-          $scope.attributeOptions = {}
-          $scope.sortedAttributes = []
-          setRecordAttributes()
-          return getWorkspace(skipCache)
+          $scope.attributesLoaded = false;
+          $scope.attributeOptions = {};
+          $scope.sortedAttributes = [];
+          setRecordAttributes();
+          return getWorkspace(skipCache);
         }
 
         /**
@@ -1388,7 +1388,7 @@ export function Directives (plugin) {
        * @since	0.5.75
        * @param	{string}	operator
        */
-        $scope.$watch('operator', setOperator)
+        $scope.$watch('operator', setOperator);
 
         /**
        * Watch Add Filter Button
@@ -1399,20 +1399,20 @@ export function Directives (plugin) {
        */
         $scope.$watch('addFilterSelector', function (selected) {
           if (!selected) {
-            return
+            return;
           }
 
-          var isSubCondition = inlineFilter.inOperators(selected)
+          var isSubCondition = inlineFilter.inOperators(selected);
 
           if (isSubCondition) {
-            $scope.addSubCondition(selected)
+            $scope.addSubCondition(selected);
           } else {
-            $scope.addAttributeCondition(selected)
+            $scope.addAttributeCondition(selected);
           }
 
           // Reset
-          $scope.addFilterSelector = ''
-        })
+          $scope.addFilterSelector = '';
+        });
       }])
     .directive('znFilterValueIn', [function () {
       return {
@@ -1423,53 +1423,53 @@ export function Directives (plugin) {
         },
         require: 'ngModel',
         link: function (scope, element, attrs, ngModelCtrl) {
-          scope.value = []
+          scope.value = [];
 
           // Convert Model Value to View Value
           ngModelCtrl.$formatters.push(function (modelValue) {
             if (!modelValue) {
-              return
+              return;
             }
 
             if (typeof modelValue === 'string') {
-              modelValue = JSON.parse(modelValue)
+              modelValue = JSON.parse(modelValue);
             }
 
             return modelValue.map(function (value) {
               return {
                 id: value
-              }
-            })
-          })
+              };
+            });
+          });
 
           // Convert View Value to Model Value
           ngModelCtrl.$parsers.push(function (viewValue) {
             if (!viewValue) {
-              return
+              return;
             }
 
             return viewValue.map(function (option) {
-              return option.id
-            })
-          })
+              return option.id;
+            });
+          });
 
           // Render to Scope Variables
           ngModelCtrl.$render = function () {
-            scope.value = ngModelCtrl.$viewValue || []
-          }
+            scope.value = ngModelCtrl.$viewValue || [];
+          };
 
           scope.$watch('value', function (value, previous) {
             if (!value) {
-              return
+              return;
             }
 
             if (!angular.equals(value, previous)) {
-              ngModelCtrl.$setViewValue(value)
+              ngModelCtrl.$setViewValue(value);
             }
-          }, true)
+          }, true);
         },
         controller: ['$scope', function ($scope) {
-          $scope.multiSelectOptions = []
+          $scope.multiSelectOptions = [];
 
           $scope.multiSelectTranslations = {
             buttonDefaultText: '',
@@ -1477,35 +1477,35 @@ export function Directives (plugin) {
             uncheckAll: 'Select None',
             selectionCount: 'selected',
             dynamicButtonTextSuffix: 'selected'
-          }
+          };
 
           $scope.multiSelectExtras = {
             enableSearch: false,
             scrollable: true
-          }
+          };
 
           function getMultiSelectOptions (options) {
             if (!options) {
-              return
+              return;
             }
 
-            var keys = Object.keys(options)
+            var keys = Object.keys(options);
 
             return keys.map(function (value) {
               return {
                 id: value,
                 label: options[value]
-              }
-            })
+              };
+            });
           }
 
           $scope.$watch('options', function (options) {
-            $scope.multiSelectOptions = getMultiSelectOptions(options)
-            $scope.multiSelectExtras.enableSearch = (options && Object.keys(options).length > 10)
-          })
+            $scope.multiSelectOptions = getMultiSelectOptions(options);
+            $scope.multiSelectExtras.enableSearch = (options && Object.keys(options).length > 10);
+          });
         }],
         templateUrl: '/templates/partials/inline-filter-attribute-condition-in.html'
-      }
+      };
     }])
     .directive('znFilterAttributeCondition', [function () {
       return {
@@ -1528,7 +1528,7 @@ export function Directives (plugin) {
         },
         controller: 'filterAttributeConditionCntl',
         templateUrl: '/templates/partials/inline-filter-attribute-condition.html'
-      }
+      };
     }])
     .controller('filterAttributeConditionCntl', ['$scope', '$rootScope', 'znData', 'inlineFilter',
       function ($scope, $rootScope, znData, inlineFilter) {
@@ -1536,101 +1536,101 @@ export function Directives (plugin) {
           return $scope.subfilters &&
             ($scope.subFilterBelowMaxCount()) &&
             ($scope.subFilterBelowMaxLevel()) &&
-            !$scope.subFilterExistsForAttribute()
-        }
+            !$scope.subFilterExistsForAttribute();
+        };
 
         $scope.subFilterExistsForAttribute = function () {
-          var exists = false
+          var exists = false;
 
           angular.forEach($scope.conditions, function (condition) {
             if (condition.filter &&
               condition.attribute == $scope.condition.attribute) {
-              exists = true
+              exists = true;
             }
-          })
+          });
 
-          return exists
-        }
+          return exists;
+        };
 
         $scope.subFilterBelowMaxCount = function () {
-          return $scope.counts.dynamicCount < 2
-        }
+          return $scope.counts.dynamicCount < 2;
+        };
 
         $scope.subFilterBelowMaxLevel = function () {
-          return $scope.nextLevel <= 5
-        }
+          return $scope.nextLevel <= 5;
+        };
 
         $scope.isLinkedAttribute = function () {
           return ($scope.attributeOptions[$scope.condition.attribute] &&
             $scope.attributeOptions[$scope.condition.attribute].type == 'linked'
-          )
-        }
+          );
+        };
 
         $scope.isCustomFilter = function () {
-          return Object.prototype.hasOwnProperty.call($scope.condition, 'filter')
-        }
+          return Object.prototype.hasOwnProperty.call($scope.condition, 'filter');
+        };
 
         $scope.notHasOneRelation = function () {
-          return ($scope.condition.attribute.indexOf('form') == -1)
-        }
+          return ($scope.condition.attribute.indexOf('form') == -1);
+        };
 
         $scope.isValidForFiltering = function () {
-          return ($scope.isLinkedAttribute() && $scope.attrIsValidForFiltering !== undefined) ? $scope.attrIsValidForFiltering : true
-        }
+          return ($scope.isLinkedAttribute() && $scope.attrIsValidForFiltering !== undefined) ? $scope.attrIsValidForFiltering : true;
+        };
 
         $scope.setAllowedPrefixes = function (allowedPrefixes, template) {
-          $scope.allowedPrefixes = []
+          $scope.allowedPrefixes = [];
 
-          var types = [] // e.g. Number, String
+          var types = []; // e.g. Number, String
 
           angular.forEach($scope.prefixOptions, function (option) {
             if (allowedPrefixes.indexOf(option.label) !== -1) {
               if (option.type && types.indexOf(option.type) == -1) {
-                types.push(option.type)
+                types.push(option.type);
               }
 
-              $scope.allowedPrefixes.push(angular.copy(option))
+              $scope.allowedPrefixes.push(angular.copy(option));
             }
-          })
+          });
 
           // don't group by type, if less than 2 types
           if (types.length < 2 || template === 'number') {
             angular.forEach($scope.allowedPrefixes, function (prefix) {
-              delete prefix.type
-            })
+              delete prefix.type;
+            });
           }
-        }
+        };
 
         // Set countries and states
         $rootScope.$watch('states', function (states) {
           if (states) {
-            $scope.states = states
+            $scope.states = states;
           }
-        })
+        });
 
         $rootScope.$watch('countries', function (countries) {
           if (countries) {
-            $scope.countries = countries
+            $scope.countries = countries;
           }
-        })
+        });
 
         $rootScope.$watch('constants', function (constants) {
           if (constants) {
-            $scope.constants = constants
+            $scope.constants = constants;
           }
-        })
+        });
 
-        var defaultPrefixes = ['is', 'isn\'t']
-        var stringPrefixes = ['contains', 'does not contain', 'starts with', 'ends with']
-        var validationPrefixes = ['does not validate']
-        var existPrefixes = ['exists', 'does not exist']
-        var numberPrefixes = ['is greater than or equal to', 'is less than or equal to']
-        var datePrefixes = ['is', 'since', 'before']
-        var datetimePrefixes = ['since', 'before']
-        var containsPrefixes = ['contains', 'does not contain']
-        var listPrefixes = ['is any of', 'is not any of']
-        var allWithListPrefixes = defaultPrefixes.concat(stringPrefixes, listPrefixes, existPrefixes, numberPrefixes)
-        var allPrefixes = defaultPrefixes.concat(stringPrefixes, existPrefixes, numberPrefixes)
+        var defaultPrefixes = ['is', 'isn\'t'];
+        var stringPrefixes = ['contains', 'does not contain', 'starts with', 'ends with'];
+        var validationPrefixes = ['does not validate'];
+        var existPrefixes = ['exists', 'does not exist'];
+        var numberPrefixes = ['is greater than or equal to', 'is less than or equal to'];
+        var datePrefixes = ['is', 'since', 'before'];
+        var datetimePrefixes = ['since', 'before'];
+        var containsPrefixes = ['contains', 'does not contain'];
+        var listPrefixes = ['is any of', 'is not any of'];
+        var allWithListPrefixes = defaultPrefixes.concat(stringPrefixes, listPrefixes, existPrefixes, numberPrefixes);
+        var allPrefixes = defaultPrefixes.concat(stringPrefixes, existPrefixes, numberPrefixes);
 
         $scope.fieldTypes = {
           'text-input': {
@@ -1716,9 +1716,9 @@ export function Directives (plugin) {
             prefixes: ['is'],
             template: 'draft'
           }
-        }
+        };
 
-        $scope.selected = {}
+        $scope.selected = {};
 
         $scope.validationValues = {
           alpha: 'Alphabetic',
@@ -1728,17 +1728,17 @@ export function Directives (plugin) {
           zipCode: 'Zip',
           // 'required': 'Required',
           unique: 'No Duplicates'
-        }
+        };
 
         $scope.existOptionSelected = function () {
           return $scope.selected.prefix &&
-            $scope.selected.prefix.indexOf('exists') !== -1
-        }
+            $scope.selected.prefix.indexOf('exists') !== -1;
+        };
 
         $scope.validationOptionSelected = function () {
           return $scope.selected.prefix &&
-            $scope.selected.prefix.indexOf('validates') !== -1
-        }
+            $scope.selected.prefix.indexOf('validates') !== -1;
+        };
 
         /**
        * Upate Filter Condition Attribute & Value
@@ -1750,15 +1750,15 @@ export function Directives (plugin) {
         $scope.$watch('selected.prefix', function (prefix) {
           if (typeof prefix === 'string') {
             if ($scope.existOptionSelected()) {
-              prefix = prefix.replace('exists', '')
-              $scope.condition.value = 'null'
+              prefix = prefix.replace('exists', '');
+              $scope.condition.value = 'null';
             } else if ($scope.condition.value == 'null') {
-              $scope.condition.value = ''
+              $scope.condition.value = '';
             }
 
-            $scope.condition.prefix = prefix
+            $scope.condition.prefix = prefix;
           }
-        })
+        });
 
         /**
        * When an Attribute is Chosen for First Time, Add to Conditions
@@ -1768,9 +1768,9 @@ export function Directives (plugin) {
        */
         $scope.$watch('selected.attribute', function (attribute) {
           if (attribute) {
-            $scope.condition.attribute = attribute
+            $scope.condition.attribute = attribute;
           }
-        })
+        });
 
         /**
        * Select Exists/Does Not Exists Dropdown Options
@@ -1782,68 +1782,68 @@ export function Directives (plugin) {
         $scope.$watch('condition.prefix', function (prefix) {
           if ((prefix === '' || prefix === 'not') &&
             $scope.condition.value === 'null') {
-            prefix = prefix + 'exists'
+            prefix = prefix + 'exists';
           }
 
-          $scope.selected.prefix = prefix
-        })
+          $scope.selected.prefix = prefix;
+        });
 
         $scope.$watch('condition.attribute', function (attr, oldAttr) {
-          var allowedPrefixes = defaultPrefixes.concat(existPrefixes)
-          var type = ''
-          var template = 'default'
+          var allowedPrefixes = defaultPrefixes.concat(existPrefixes);
+          var type = '';
+          var template = 'default';
 
           if (!attr) {
-            return $scope.setAllowedPrefixes(defaultPrefixes, template)
+            return $scope.setAllowedPrefixes(defaultPrefixes, template);
           }
 
           if ($scope.attributeOptions[attr] &&
             $scope.attributeOptions[attr].type) {
-            type = $scope.attributeOptions[attr].type
+            type = $scope.attributeOptions[attr].type;
 
             if ($scope.fieldTypes[type] &&
               $scope.fieldTypes[type].prefixes) {
-              allowedPrefixes = $scope.fieldTypes[type].prefixes
-              template = $scope.fieldTypes[type].template
+              allowedPrefixes = $scope.fieldTypes[type].prefixes;
+              template = $scope.fieldTypes[type].template;
 
               if (type === 'dropdown') {
-                $scope.fieldTypes.dropdown.template = 'single'
+                $scope.fieldTypes.dropdown.template = 'single';
 
                 if ($scope.attributeOptions[attr].settings.properties.multiple) {
-                  allowedPrefixes = $scope.fieldTypes.checkbox.prefixes
-                  $scope.fieldTypes.dropdown.template = 'multiple'
+                  allowedPrefixes = $scope.fieldTypes.checkbox.prefixes;
+                  $scope.fieldTypes.dropdown.template = 'multiple';
                 }
               }
             }
           }
 
-          $scope.setAllowedPrefixes(allowedPrefixes, template)
+          $scope.setAllowedPrefixes(allowedPrefixes, template);
 
           if (oldAttr && oldAttr !== attr) { // reset value
             if ($scope.isCustomFilter()) {
-              $scope.removeSubfilter()
+              $scope.removeSubfilter();
             } else {
-              $scope.condition.value = ''
+              $scope.condition.value = '';
             }
 
-            $scope.selected.prefix = $scope.allowedPrefixes[0].prefix
+            $scope.selected.prefix = $scope.allowedPrefixes[0].prefix;
           }
 
           // set prefix
-          var prefixFound = false
+          var prefixFound = false;
 
           angular.forEach($scope.allowedPrefixes, function (prefix) {
             if (prefix.prefix == $scope.selected.prefix) {
-              prefixFound = true
+              prefixFound = true;
             }
-          })
+          });
 
           if (!prefixFound) {
-            $scope.selected.prefix = $scope.allowedPrefixes[0].prefix
+            $scope.selected.prefix = $scope.allowedPrefixes[0].prefix;
           }
 
-          $scope.initLinkedAttribute()
-        })
+          $scope.initLinkedAttribute();
+        });
 
         /**
        * Set linked form name, custom filter options and filter prop if not set
@@ -1854,29 +1854,29 @@ export function Directives (plugin) {
        */
         $scope.initLinkedAttribute = function () {
           if ($scope.isLinkedAttribute()) {
-            var linkedFormId
+            var linkedFormId;
 
             if ($scope.notHasOneRelation()) {
-              linkedFormId = $scope.attributeOptions[$scope.condition.attribute].settings.properties.linkedForm
+              linkedFormId = $scope.attributeOptions[$scope.condition.attribute].settings.properties.linkedForm;
             } else {
-              linkedFormId = $scope.condition.attribute.substring(4)
+              linkedFormId = $scope.condition.attribute.substring(4);
             }
 
             // set empty subfilter if hasOne relation
             if (!$scope.notHasOneRelation()) {
-              $scope.initSubFilter()
+              $scope.initSubFilter();
             } else if ($scope.condition.value) {
-              $scope.selected.value = { id: $scope.condition.value }
+              $scope.selected.value = { id: $scope.condition.value };
 
               znData('FormRecords').get({ id: $scope.condition.value, formId: linkedFormId }).then(function (record) {
-                $scope.selected.value.name = record.name
-              })
+                $scope.selected.value.name = record.name;
+              });
             }
             if ($scope.forms[linkedFormId]) {
-              $scope.linkedFormName = $scope.forms[linkedFormId].name
-              $scope.attrIsValidForFiltering = true
+              $scope.linkedFormName = $scope.forms[linkedFormId].name;
+              $scope.attrIsValidForFiltering = true;
             } else {
-              $scope.attrIsValidForFiltering = false
+              $scope.attrIsValidForFiltering = false;
             }
 
             $scope.customFilterinlineOptions = angular.extend({},
@@ -1884,9 +1884,9 @@ export function Directives (plugin) {
               {
                 formId: linkedFormId
               }
-            )
+            );
           }
-        }
+        };
 
         /**
        * Disable/Enable Attributes
@@ -1897,25 +1897,25 @@ export function Directives (plugin) {
        */
         $scope.disableHasOneAttributes = function (disable) {
           angular.forEach($scope.sortedAttributes, function (attribute, index) {
-            var hasOneRelation = attribute.attribute.indexOf('form') === 0
+            var hasOneRelation = attribute.attribute.indexOf('form') === 0;
 
             if (hasOneRelation) {
-              $scope.sortedAttributes[index].disabled = !!disable
+              $scope.sortedAttributes[index].disabled = !!disable;
             }
-          })
-        }
+          });
+        };
 
         $scope.conditionType = function () {
-          return Object.prototype.hasOwnProperty.call($scope.condition, 'filter') ? 'custom-filter' : 'specific-record'
-        }
+          return Object.prototype.hasOwnProperty.call($scope.condition, 'filter') ? 'custom-filter' : 'specific-record';
+        };
 
         $scope.removeAttributeCondition = function () {
-          $scope.removeSubfilter()
+          $scope.removeSubfilter();
 
-          $scope.counts.conditionCount--
+          $scope.counts.conditionCount--;
 
-          $scope.removeParentCondition()
-        }
+          $scope.removeParentCondition();
+        };
 
         /**
        * Remove Filter From Condition
@@ -1926,16 +1926,16 @@ export function Directives (plugin) {
        */
         $scope.removeSubfilter = function () {
           if ($scope.condition.filter) {
-            $scope.counts.dynamicCount--
+            $scope.counts.dynamicCount--;
 
             // enable hasOne attributes
             if ($scope.subFilterConditionAllowed()) {
-              $scope.disableHasOneAttributes(false)
+              $scope.disableHasOneAttributes(false);
             }
 
-            delete $scope.condition.filter
+            delete $scope.condition.filter;
           }
-        }
+        };
 
         /**
        * Add Subfilter to Condition (or Reset if Changing Attributes)
@@ -1947,48 +1947,48 @@ export function Directives (plugin) {
         $scope.initSubFilter = function () {
           // Sub Filter Not Allowed
           if (!$scope.subFilterConditionAllowed()) {
-            return
+            return;
           }
 
           // set empty filter
           if (!$scope.condition.filter) {
-            var subfilter = inlineFilter.getDefaultFilter($scope.options.operators)
+            var subfilter = inlineFilter.getDefaultFilter($scope.options.operators);
 
-            $scope.condition.filter = subfilter
+            $scope.condition.filter = subfilter;
           }
 
           // Increment Dynamic Count
-          $scope.counts.dynamicCount++
+          $scope.counts.dynamicCount++;
 
           if ($scope.counts.dynamicCount >= 2) {
-            $scope.disableHasOneAttributes(true)
+            $scope.disableHasOneAttributes(true);
           }
 
           // remove condition attribute
-          delete $scope.condition.value
+          delete $scope.condition.value;
 
-          $scope.setAllowedPrefixes(defaultPrefixes)
-        }
+          $scope.setAllowedPrefixes(defaultPrefixes);
+        };
 
         $scope.setConditionType = function (type) {
           // Unchanged
           if (type == $scope.conditionType()) {
-            return
+            return;
           }
 
           if (type == 'specific-record') {
             // set empty value
-            $scope.condition.value = null
+            $scope.condition.value = null;
 
             // remove filter
-            $scope.removeSubfilter()
+            $scope.removeSubfilter();
 
-            $scope.setAllowedPrefixes(defaultPrefixes.concat(existPrefixes))
-            $scope.selected.prefix = $scope.allowedPrefixes[0].prefix
+            $scope.setAllowedPrefixes(defaultPrefixes.concat(existPrefixes));
+            $scope.selected.prefix = $scope.allowedPrefixes[0].prefix;
           } else {
-            $scope.initSubFilter()
+            $scope.initSubFilter();
           }
-        }
+        };
       }])
     .directive('znFilterValue', ['$http', '$compile', '$templateCache', function ($http, $compile, $templateCache) {
       return {
@@ -1998,58 +1998,58 @@ export function Directives (plugin) {
           var unbind = $scope.$watch('condition.value', function (value) {
             if (value !== undefined) {
               if (value == null) {
-                $scope.condition.value = ''
+                $scope.condition.value = '';
               }
 
-              unbind()
+              unbind();
             }
-          })
+          });
 
           $scope.$watch('selected.value', function (value) {
             if (value && value.id) {
-              $scope.condition.value = value.id
+              $scope.condition.value = value.id;
             }
-          })
+          });
         }],
         link: function (scope, element, attrs) {
-          var baseUrl = '/templates/partials/filters-panel/'
+          var baseUrl = '/templates/partials/filters-panel/';
 
           function setElementHtml (content) {
-            element.html($compile(content)(scope.$new()))
+            element.html($compile(content)(scope.$new()));
           }
 
           scope.$watch(attrs.znFilterValue, function (valueTemplate) {
-            var templateUrl
+            var templateUrl;
 
             if (valueTemplate) {
-              templateUrl = baseUrl + valueTemplate + '.html'
+              templateUrl = baseUrl + valueTemplate + '.html';
             } else {
-              templateUrl = baseUrl + 'default.html'
+              templateUrl = baseUrl + 'default.html';
             }
 
-            var template = $templateCache.get(templateUrl)
+            var template = $templateCache.get(templateUrl);
 
             if (template) {
-              setElementHtml(template)
+              setElementHtml(template);
             } else {
               $http.get(templateUrl).then(function (response) {
-                $templateCache.put(templateUrl, response.data)
+                $templateCache.put(templateUrl, response.data);
 
-                setElementHtml(response.data)
-              })
+                setElementHtml(response.data);
+              });
             }
-          })
+          });
         }
-      }
+      };
     }])
     .directive('znTooltip', [function () {
       return {
         restrict: 'A',
         link: function (scope, element, attrs) {
-          let isOpen = false
+          let isOpen = false;
 
           element.on('mouseenter', () => {
-            const { top, left, right, bottom } = element.context.getBoundingClientRect()
+            const { top, left, right, bottom } = element.context.getBoundingClientRect();
             const options = {
               top,
               left,
@@ -2058,32 +2058,32 @@ export function Directives (plugin) {
               message: attrs.znTooltip,
               side: attrs.tooltipPlacement,
               delay: Number(attrs.tooltipPopupDelay)
-            }
+            };
 
             plugin.client.call({
               method: 'openTooltip',
               args: {
                 options
               }
-            })
+            });
 
-            isOpen = true
-          })
+            isOpen = true;
+          });
 
           element.on('mouseleave', () => {
             isOpen && plugin.client.call({
               method: 'closeTooltip'
-            })
+            });
 
-            isOpen = false
-          })
+            isOpen = false;
+          });
 
           element.on('$destroy', () => {
             isOpen && plugin.client.call({
               method: 'closeTooltip'
-            })
-          })
+            });
+          });
         }
-      }
-    }])
+      };
+    }]);
 }

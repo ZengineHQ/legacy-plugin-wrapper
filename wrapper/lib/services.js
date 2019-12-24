@@ -1,22 +1,22 @@
-import { client } from './wrapper'
+import { client } from './wrapper';
 
 export function Services (plugin) {
 
   function sanitizeForPostMessage (obj) {
-    const referenceMap = new Map()
+    const referenceMap = new Map();
 
     function sanitize (obj) {
       if (referenceMap.has(obj)) {
         // the reference at this location is what we want
         // (either circular object or a primitive we've seen before)
-        return referenceMap.get(obj)
+        return referenceMap.get(obj);
       }
 
       if (Object(obj) !== obj) {
         // short circuit for obvious primitive values
-        referenceMap.set(obj, obj)
+        referenceMap.set(obj, obj);
 
-        return obj
+        return obj;
       }
 
       switch ({}.toString.call(obj).slice(8, -1)) { // gets the class name (probably)
@@ -31,76 +31,76 @@ export function Services (plugin) {
         case 'ImageBitmap':
         case 'ArrayBuffer':
           // is a supported data type that doesn't need to be cloned
-          referenceMap.set(obj, obj)
+          referenceMap.set(obj, obj);
 
-          return obj
+          return obj;
         case 'Array': {
-          const newArr = []
+          const newArr = [];
 
           // store the new reference before looping to avoid infinite loop
-          referenceMap.set(obj, newArr)
+          referenceMap.set(obj, newArr);
 
           // use reduce to build array and maintain new reference as the return value
           return obj.reduce((nA, el) => {
-            nA.push(sanitize(el))
+            nA.push(sanitize(el));
 
-            return nA
-          }, newArr)
+            return nA;
+          }, newArr);
         }
         case 'Object': {
-          const newObj = {}
+          const newObj = {};
 
           // store the new reference before looping to avoid infinite loop
-          referenceMap.set(obj, newObj)
+          referenceMap.set(obj, newObj);
 
           // use reduce to build object and maintain new reference as the return value
           return Object.keys(obj).reduce((nO, key) => {
             // We don't want angular properties beginning with $
             if (key[0] !== '$') {
-              nO[key] = sanitize(obj[key])
+              nO[key] = sanitize(obj[key]);
             }
 
-            return nO
-          }, newObj)
+            return nO;
+          }, newObj);
         }
         case 'Map': {
-          const newMap = new Map()
+          const newMap = new Map();
 
-          referenceMap.set(obj, newMap) // store the new reference before looping to avoid infinite loop
+          referenceMap.set(obj, newMap); // store the new reference before looping to avoid infinite loop
 
           // have to be careful what methods are used because of IE11 (Map has no polyfills)
           obj.forEach((value, key) => {
-            const newKey = sanitize(key)
+            const newKey = sanitize(key);
 
             if (key === undefined || newKey !== undefined) {
-              newMap.set(newKey, sanitize(value))
+              newMap.set(newKey, sanitize(value));
             }
-          })
+          });
 
-          return newMap
+          return newMap;
         }
         case 'Set': {
-          const newSet = new Set()
+          const newSet = new Set();
 
-          referenceMap.set(obj, newSet) // store the new reference before looping to avoid infinite loop
+          referenceMap.set(obj, newSet); // store the new reference before looping to avoid infinite loop
 
           // have to be careful what methods are used because of IE11 (Set has no polyfills)
           obj.forEach(value => {
-            const newValue = sanitize(value)
+            const newValue = sanitize(value);
 
             if (value === undefined || newValue !== undefined) {
-              newSet.add(newValue)
+              newSet.add(newValue);
             }
-          })
+          });
 
-          return newSet
+          return newSet;
         }
         default:
-          return undefined // obj is not structured-clone-friendly (like a function, for example)
+          return undefined; // obj is not structured-clone-friendly (like a function, for example)
       }
     }
 
-    return sanitize(obj)
+    return sanitize(obj);
   }
 
   plugin
@@ -115,12 +115,12 @@ export function Services (plugin) {
         compile: function (element, link) {
           // Normalize the link parameter
           if (angular.isFunction(link)) {
-            link = { post: link }
+            link = { post: link };
           }
 
           // Break the recursion loop by removing the contents
-          var contents = element.contents().remove()
-          var compiledContents
+          var contents = element.contents().remove();
+          var compiledContents;
           return {
             pre: (link && link.pre) ? link.pre : null,
             /**
@@ -129,21 +129,21 @@ export function Services (plugin) {
             post: function (scope, element) {
               // Compile the contents
               if (!compiledContents) {
-                compiledContents = $compile(contents)
+                compiledContents = $compile(contents);
               }
               // Re-add the compiled contents to the element
               compiledContents(scope, function (clone) {
-                element.append(clone)
-              })
+                element.append(clone);
+              });
 
               // Call the post-linking function, if any
               if (link && link.post) {
-                link.post.apply(null, arguments)
+                link.post.apply(null, arguments);
               }
             }
-          }
+          };
         }
-      }
+      };
     }])
     .factory('filterDefinition', ['inlineFilter', function filterDefinitionFactory (inlineFilter) {
       /**
@@ -155,7 +155,7 @@ export function Services (plugin) {
        * @returns	{string}
        */
       function getOperator (filter) {
-        return inlineFilter.getOperator(filter)
+        return inlineFilter.getOperator(filter);
       }
 
       /**
@@ -167,16 +167,16 @@ export function Services (plugin) {
      * @returns	{object}	parsed
      */
       function parseFilter (filter) {
-        var operator = getOperator(filter)
+        var operator = getOperator(filter);
 
         if (!operator) {
-          return false
+          return false;
         }
 
         return {
           operator: operator,
           conditions: filter[operator]
-        }
+        };
       }
 
       /**
@@ -189,7 +189,7 @@ export function Services (plugin) {
      */
       var filterDef = function (filter) {
         // Definition Object
-        var def = {}
+        var def = {};
 
         /**
        * Set Filter
@@ -199,16 +199,16 @@ export function Services (plugin) {
        * @param	{object}	options
        */
         def.setFilter = function (options) {
-          var filter = parseFilter(options)
+          var filter = parseFilter(options);
 
           if (!filter) {
-            return false
+            return false;
           }
 
-          def.setOperator(filter.operator)
+          def.setOperator(filter.operator);
 
-          def.setConditions(filter.conditions)
-        }
+          def.setConditions(filter.conditions);
+        };
 
         /**
        * Set Operator
@@ -218,8 +218,8 @@ export function Services (plugin) {
        * @param	{string}	operator
        */
         def.setOperator = function (operator) {
-          def.operator = operator
-        }
+          def.operator = operator;
+        };
 
         /**
        * Set Conditions
@@ -229,57 +229,57 @@ export function Services (plugin) {
        * @param	{array}	conditions
        */
         def.setConditions = function (conditions) {
-          conditions = conditions || []
+          conditions = conditions || [];
 
-          var results = []
+          var results = [];
 
-          var emptyCondition = inlineFilter.getEmptyCondition()
+          var emptyCondition = inlineFilter.getEmptyCondition();
 
           angular.forEach(conditions, function (condition, key) {
             // Ignore Empty Conditions
             if (angular.equals(condition, emptyCondition)) {
-              return
+              return;
             }
 
             if (getOperator(condition)) {
-              var nestedFilterDef = new filterDef(condition)
-              condition = nestedFilterDef.getFilter()
+              var nestedFilterDef = new filterDef(condition);
+              condition = nestedFilterDef.getFilter();
             } else if (condition.filter) {
-              var subFilterDef = new filterDef(condition.filter)
+              var subFilterDef = new filterDef(condition.filter);
 
-              condition.filter = subFilterDef.getFilter()
+              condition.filter = subFilterDef.getFilter();
             } else if (condition.value && condition.value.split &&
               condition.value.split('|').length > 1) {
-              var operator = 'or'
+              var operator = 'or';
 
               if (condition.prefix.indexOf('not') == 0) {
-                operator = 'and'
+                operator = 'and';
               }
 
-              var pipedFilter = {}
-              pipedFilter[operator] = []
+              var pipedFilter = {};
+              pipedFilter[operator] = [];
 
-              var values = condition.value.split('|')
+              var values = condition.value.split('|');
 
               angular.forEach(values, function (value) {
                 var pipedFilterCondition = {
                   prefix: condition.prefix,
                   attribute: condition.attribute,
                   value: value
-                }
+                };
 
-                pipedFilter[operator].push(pipedFilterCondition)
-              })
-              var pipedFilterDef = new filterDef(pipedFilter)
+                pipedFilter[operator].push(pipedFilterCondition);
+              });
+              var pipedFilterDef = new filterDef(pipedFilter);
 
-              condition = pipedFilterDef.getFilter()
+              condition = pipedFilterDef.getFilter();
             }
 
-            results[key] = condition
-          })
+            results[key] = condition;
+          });
 
-          def.conditions = results
-        }
+          def.conditions = results;
+        };
 
         /**
        * Get Operator
@@ -289,8 +289,8 @@ export function Services (plugin) {
        * @returns	{string}	operator
        */
         def.getOperator = function () {
-          return def.operator
-        }
+          return def.operator;
+        };
 
         /**
        * Get Conditions
@@ -300,8 +300,8 @@ export function Services (plugin) {
        * @returns	{array}	conditions
        */
         def.getConditions = function () {
-          return def.conditions
-        }
+          return def.conditions;
+        };
 
         /**
        * Get Condition
@@ -312,12 +312,12 @@ export function Services (plugin) {
        * @returns	{object}	condition
        */
         def.getCondition = function (index) {
-          var conditions = def.getConditions()
+          var conditions = def.getConditions();
           if (index < 0) {
-            index += conditions.length
+            index += conditions.length;
           }
-          return conditions[index]
-        }
+          return conditions[index];
+        };
 
         /**
        * Get Condition Count
@@ -327,20 +327,20 @@ export function Services (plugin) {
        * @returns	{int}	count
        */
         def.getConditionCount = function () {
-          var conditions = def.getConditions()
-          conditions = conditions || []
-          var count = 0
+          var conditions = def.getConditions();
+          conditions = conditions || [];
+          var count = 0;
           angular.forEach(conditions, function (condition) {
             if (condition.operator) {
-              count += condition.getConditionCount()
+              count += condition.getConditionCount();
             } else if (condition.or || condition.and) {
-              count += condition.or ? def.getRecursiveConditionCount(condition.or) : def.getRecursiveConditionCount(condition.and)
+              count += condition.or ? def.getRecursiveConditionCount(condition.or) : def.getRecursiveConditionCount(condition.and);
             } else {
-              count++
+              count++;
             }
-          })
-          return count
-        }
+          });
+          return count;
+        };
 
         /**
        * Get Recursive Condition Count
@@ -351,16 +351,16 @@ export function Services (plugin) {
        * @returns	{int}	count
        */
         def.getRecursiveConditionCount = function (arr) {
-          var count = 0
+          var count = 0;
           angular.forEach(arr, function (condition) {
             if (condition.or || condition.and) {
-              count += condition.or ? def.getRecursiveConditionCount(condition.or) : def.getRecursiveConditionCount(condition.and)
+              count += condition.or ? def.getRecursiveConditionCount(condition.or) : def.getRecursiveConditionCount(condition.and);
             } else {
-              count++
+              count++;
             }
-          })
-          return count
-        }
+          });
+          return count;
+        };
         /**
        * Get Attribute Condition
        *
@@ -370,21 +370,21 @@ export function Services (plugin) {
        * @returns	{object}	condition
        */
         def.attributeCondition = function (options) {
-          options = options || {}
+          options = options || {};
 
-          var condition = {}
+          var condition = {};
 
-          condition.prefix = options.prefix || ''
-          condition.attribute = options.attribute || ''
+          condition.prefix = options.prefix || '';
+          condition.attribute = options.attribute || '';
 
           if (options.filter) {
-            condition.filter = options.filter
+            condition.filter = options.filter;
           } else {
-            condition.value = options.value || ''
+            condition.value = options.value || '';
           }
 
-          return condition
-        }
+          return condition;
+        };
 
         /**
        * Add Condition
@@ -394,8 +394,8 @@ export function Services (plugin) {
        * @param	{object}	condition
        */
         def.addCondition = function (condition) {
-          def.conditions.push(condition)
-        }
+          def.conditions.push(condition);
+        };
 
         /**
        * Rempve Condition
@@ -405,17 +405,17 @@ export function Services (plugin) {
        * @param	{int}	index
        */
         def.removeCondition = function (options) {
-          var index = 0
+          var index = 0;
 
           if (isNaN(options)) {
             // Find Condition Index
           } else {
-            index = options
+            index = options;
           }
 
           // Remove by Index
-          def.conditions.splice(index, 1)
-        }
+          def.conditions.splice(index, 1);
+        };
 
         /**
        * Get Filter
@@ -425,21 +425,21 @@ export function Services (plugin) {
        * @return	{object}	filter
        */
         def.getFilter = function () {
-          var operator = def.getOperator()
-          var conditions = def.getConditions()
-          var filter = {}
+          var operator = def.getOperator();
+          var conditions = def.getConditions();
+          var filter = {};
 
-          filter[operator] = conditions
+          filter[operator] = conditions;
 
-          return filter
-        }
+          return filter;
+        };
 
-        def.setFilter(filter)
+        def.setFilter(filter);
 
-        return def
-      }
+        return def;
+      };
 
-      return filterDef
+      return filterDef;
     }])
     /**
      * Inline Filter Operators
@@ -469,14 +469,14 @@ export function Services (plugin) {
      */
     .service('inlineFilter', ['inlineFilterOperators', '$rootScope',
       function inlineFilterService (inlineFilterOperators, $rootScope) {
-        var svc = this
+        var svc = this;
 
         /**
      * Valid Operators
      *
      * @since	0.5.75
      */
-        svc.operators = ['and', 'or']
+        svc.operators = ['and', 'or'];
 
         /**
      * Get Default Operator
@@ -487,14 +487,14 @@ export function Services (plugin) {
      * @returns	{boolean|string}
      */
         svc.getDefaultOperator = function (operators) {
-          operators = operators || []
+          operators = operators || [];
 
           if (!operators.length) {
-            return false
+            return false;
           }
 
-          return operators[0]
-        }
+          return operators[0];
+        };
 
         /**
      * Operator in Valid Operators
@@ -505,8 +505,8 @@ export function Services (plugin) {
      * @returns	{boolean}
      */
         svc.inOperators = function (operator) {
-          return svc.operators.indexOf(operator) !== -1
-        }
+          return svc.operators.indexOf(operator) !== -1;
+        };
 
         /**
      * Get Operator
@@ -517,10 +517,10 @@ export function Services (plugin) {
      * @returns	{string}
      */
         svc.getOperator = function (filter) {
-          if (filter && Object.prototype.hasOwnProperty.call(filter, 'and')) return 'and'
-          if (filter && Object.prototype.hasOwnProperty.call(filter, 'or')) return 'or'
-          return false
-        }
+          if (filter && Object.prototype.hasOwnProperty.call(filter, 'and')) return 'and';
+          if (filter && Object.prototype.hasOwnProperty.call(filter, 'or')) return 'or';
+          return false;
+        };
 
         /**
      * Get Valid Operators from Filter Options
@@ -531,23 +531,23 @@ export function Services (plugin) {
      * @returns	{array}
      */
         svc.getOperators = function (options) {
-          var operators
-          var valid = []
+          var operators;
+          var valid = [];
 
           if (options.operators) {
-            operators = options.operators
+            operators = options.operators;
           } else {
-            operators = svc.operators
+            operators = svc.operators;
           }
 
           angular.forEach(operators, function (operator) {
             if (svc.inOperators(operator)) {
-              valid.push(operator)
+              valid.push(operator);
             }
-          })
+          });
 
-          return valid
-        }
+          return valid;
+        };
 
         /**
      * Get Operator Options
@@ -558,18 +558,18 @@ export function Services (plugin) {
      * @returns	{array}
      */
         svc.getOperatorOptions = function (operators) {
-          operators = operators || []
+          operators = operators || [];
 
-          var options = []
+          var options = [];
 
           angular.forEach(inlineFilterOperators, function (operator) {
             if (operators.indexOf(operator.operator) !== -1) {
-              options.push(operator)
+              options.push(operator);
             }
-          })
+          });
 
-          return options
-        }
+          return options;
+        };
 
         /**
      * Get Default Filter
@@ -580,14 +580,14 @@ export function Services (plugin) {
      * @returns	{object}
      */
         svc.getDefaultFilter = function (operators) {
-          var defaultOperator = svc.getDefaultOperator(operators)
+          var defaultOperator = svc.getDefaultOperator(operators);
 
           if (!defaultOperator) {
-            return false
+            return false;
           }
 
-          return svc.getEmptyFilter(defaultOperator)
-        }
+          return svc.getEmptyFilter(defaultOperator);
+        };
 
         /**
      * Get Empty Filter
@@ -596,12 +596,12 @@ export function Services (plugin) {
      * @returns	{object}
      */
         svc.getEmptyFilter = function (operator) {
-          var filter = {}
+          var filter = {};
 
-          filter[operator] = []
+          filter[operator] = [];
 
-          return filter
-        }
+          return filter;
+        };
 
         /**
      * Get Empty Condition
@@ -610,14 +610,14 @@ export function Services (plugin) {
      * @returns	{object}
      */
         svc.getEmptyCondition = function (attribute) {
-          attribute = attribute || ''
+          attribute = attribute || '';
 
           return {
             prefix: '',
             attribute: attribute,
             value: ''
-          }
-        }
+          };
+        };
 
         /**
      * Merge Conditions into Filter
@@ -627,16 +627,16 @@ export function Services (plugin) {
      * @returns	{object}
      */
         svc.mergeConditions = function (filter, conditions) {
-          var operator = svc.getOperator(filter)
+          var operator = svc.getOperator(filter);
 
           if (!operator) {
-            return false
+            return false;
           }
 
-          filter[operator] = filter[operator].concat(conditions)
+          filter[operator] = filter[operator].concat(conditions);
 
-          return filter
-        }
+          return filter;
+        };
 
         /**
      * Filter has Empty Conditions
@@ -645,14 +645,14 @@ export function Services (plugin) {
      * @returns	{Boolean}
      */
         svc.hasEmptyConditions = function (filter) {
-          var operator = svc.getOperator(filter)
+          var operator = svc.getOperator(filter);
 
           if (!operator) {
-            return false
+            return false;
           }
 
-          return filter[operator].length === 0
-        }
+          return filter[operator].length === 0;
+        };
 
         /**
      * Combine User Field Type Blacklist with System Blacklist
@@ -663,21 +663,21 @@ export function Services (plugin) {
      * @returns {array}
      */
         svc.combineFieldTypeBlacklist = function (fieldTypeBlacklist) {
-          fieldTypeBlacklist = fieldTypeBlacklist || []
+          fieldTypeBlacklist = fieldTypeBlacklist || [];
 
-          var disallowedFieldTypes = []
+          var disallowedFieldTypes = [];
 
           // Allowed non-input fields
-          var allowedExceptions = ['calculated-field', 'link-counter', 'summary']
+          var allowedExceptions = ['calculated-field', 'link-counter', 'summary'];
 
           angular.forEach($rootScope.formFieldTaxonomy, function (taxonomy) {
             if (!taxonomy.isInput && allowedExceptions.indexOf(taxonomy.id) == -1) {
-              disallowedFieldTypes.push(taxonomy.id)
+              disallowedFieldTypes.push(taxonomy.id);
             }
-          })
+          });
 
-          return disallowedFieldTypes.concat(fieldTypeBlacklist)
-        }
+          return disallowedFieldTypes.concat(fieldTypeBlacklist);
+        };
       }])
     .service('filterWorkspace', ['$rootScope', '$q', function filterWorkspaceService ($rootScope, $q) {
       /**
@@ -685,7 +685,7 @@ export function Services (plugin) {
        *
        * @type	{object}
        */
-      var workspaces = {}
+      var workspaces = {};
 
       /**
      * Get Workspace by Workspace Id or Form Id
@@ -695,18 +695,18 @@ export function Services (plugin) {
      */
       function getWorkspace () {
         if ($rootScope.workspace) {
-          return $q.when($rootScope.workspace)
+          return $q.when($rootScope.workspace);
         }
 
-        const deferred = $q.defer()
+        const deferred = $q.defer();
 
         client.call(
           { method: 'context' }
         ).then(context => {
-          deferred.resolve(context.workspace)
-        })
+          deferred.resolve(context.workspace);
+        });
 
-        return deferred.promise
+        return deferred.promise;
       }
 
       /**
@@ -716,13 +716,13 @@ export function Services (plugin) {
      * @returns	{object}
      */
       function indexWorkspaceForms (workspaceForms) {
-        var forms = {}
+        var forms = {};
 
         angular.forEach(workspaceForms, function (form) {
-          forms[form.id] = form
-        })
+          forms[form.id] = form;
+        });
 
-        return forms
+        return forms;
       }
 
       /**
@@ -732,26 +732,26 @@ export function Services (plugin) {
      * @returns	{object}
      */
       function setWorkspaceUsers (workspaceMembers) {
-        var users = []
+        var users = [];
         angular.forEach(workspaceMembers, function (member) {
-          users.push(member.user)
-        })
+          users.push(member.user);
+        });
 
         var compare = function (a, b) {
-          var compareA = a.displayName && a.displayName.toLowerCase()
-          var compareB = b.displayName && b.displayName.toLowerCase()
+          var compareA = a.displayName && a.displayName.toLowerCase();
+          var compareB = b.displayName && b.displayName.toLowerCase();
           if (compareA < compareB) {
-            return -1
+            return -1;
           }
           if (compareA > compareB) {
-            return 1
+            return 1;
           }
-          return 0
-        }
+          return 0;
+        };
 
-        users.sort(compare)
+        users.sort(compare);
 
-        return users
+        return users;
       }
 
       return {
@@ -759,256 +759,256 @@ export function Services (plugin) {
           return getWorkspace(options, skipCache)
             .then(function (workspace) {
               if (skipCache && workspaces[workspace.id]) {
-                return workspaces[workspace.id]
+                return workspaces[workspace.id];
               }
 
-              workspaces[workspace.id] = angular.copy(workspace)
+              workspaces[workspace.id] = angular.copy(workspace);
 
               // Index Forms
-              workspaces[workspace.id].forms = indexWorkspaceForms(workspace.forms)
+              workspaces[workspace.id].forms = indexWorkspaceForms(workspace.forms);
 
               // Set Users
-              workspaces[workspace.id].users = setWorkspaceUsers(workspace.members)
+              workspaces[workspace.id].users = setWorkspaceUsers(workspace.members);
 
-              return workspaces[workspace.id]
+              return workspaces[workspace.id];
             }, function () {
-              return false
-            })
+              return false;
+            });
         }
-      }
+      };
     }])
     .factory('validateFilterOptions', ['inlineFilter', function validateFilterOptions (inlineFilter) {
-      var genericMessage = 'Invalid filter passed to znFiltersPanel. '
+      var genericMessage = 'Invalid filter passed to znFiltersPanel. ';
 
       function optionsError (message) {
-        throw new Error(genericMessage + message)
+        throw new Error(genericMessage + message);
       }
 
       function getOperator (filter) {
-        return inlineFilter.getOperator(filter)
+        return inlineFilter.getOperator(filter);
       }
 
       function getAttributeType (attribute, fields) {
         if (attribute.indexOf('field') === -1) {
-          return undefined
+          return undefined;
         }
 
-        var fieldId = attribute.substring(5)
+        var fieldId = attribute.substring(5);
 
-        var type
+        var type;
 
         angular.forEach(fields, function (field) {
           if (field.id == fieldId) {
-            type = field.type
+            type = field.type;
           }
-        })
+        });
 
-        return type
+        return type;
       }
 
       function validateSubfilters (filter, subfilters) {
         if (subfilters !== false) {
-          return
+          return;
         }
 
-        var operator = getOperator(filter)
+        var operator = getOperator(filter);
 
         angular.forEach(filter[operator], function (condition) {
           if (Object.prototype.hasOwnProperty.call(condition, 'filter')) {
-            optionsError('Subfilters is not allowed by filter options')
+            optionsError('Subfilters is not allowed by filter options');
           }
 
           if (Object.prototype.hasOwnProperty.call(condition, 'and') || Object.prototype.hasOwnProperty.call(condition, 'or')) {
-            validateSubfilters(condition, subfilters)
+            validateSubfilters(condition, subfilters);
           }
-        })
+        });
       }
 
       function validateGroups (filter, groups) {
         if (groups !== false) {
-          return
+          return;
         }
 
-        var operator = getOperator(filter)
+        var operator = getOperator(filter);
 
         angular.forEach(filter[operator], function (condition) {
           if (Object.prototype.hasOwnProperty.call(condition, 'and') || Object.prototype.hasOwnProperty.call(condition, 'or')) {
-            optionsError('Groups is not allowed by filter options')
+            optionsError('Groups is not allowed by filter options');
           }
 
           if (Object.prototype.hasOwnProperty.call(condition, 'filter')) {
-            validateGroups(condition.filter, groups)
+            validateGroups(condition.filter, groups);
           }
-        })
+        });
       }
 
       function validateDynamicValues (filter, dynamicValues) {
         if (dynamicValues !== false) {
-          return
+          return;
         }
 
-        var operator = getOperator(filter)
+        var operator = getOperator(filter);
 
         angular.forEach(filter[operator], function (condition) {
           if (Object.prototype.hasOwnProperty.call(condition, 'value') && condition.value === 'logged-in-user') {
-            optionsError('Dynamic value "logged-in-user" is not allowed by filter options')
+            optionsError('Dynamic value "logged-in-user" is not allowed by filter options');
           }
 
           if (Object.prototype.hasOwnProperty.call(condition, 'and') || Object.prototype.hasOwnProperty.call(condition, 'or')) {
-            validateDynamicValues(condition, dynamicValues)
+            validateDynamicValues(condition, dynamicValues);
           }
 
           if (Object.prototype.hasOwnProperty.call(condition, 'filter')) {
-            validateDynamicValues(condition.filter, dynamicValues)
+            validateDynamicValues(condition.filter, dynamicValues);
           }
-        })
+        });
       }
 
       function validateOperators (filter, operators) {
-        var allowedOperators = ['and', 'or']
+        var allowedOperators = ['and', 'or'];
 
         if (!angular.isArray(operators)) {
-          return
+          return;
         }
 
         if (operators == allowedOperators) {
-          return
+          return;
         }
 
         if (operators.length > 2 || operators.length == 2) {
-          return
+          return;
         }
 
-        var notAllowedOperator
+        var notAllowedOperator;
 
         angular.forEach(operators, function (operator) {
           if (allowedOperators.indexOf(operator) === -1) {
-            return
+            return;
           }
 
-          notAllowedOperator = (operator == 'and') ? 'or' : 'and'
-        })
+          notAllowedOperator = (operator == 'and') ? 'or' : 'and';
+        });
 
-        var operator = getOperator(filter)
+        var operator = getOperator(filter);
 
         if (operator == notAllowedOperator) {
-          optionsError('Operator "' + notAllowedOperator + '" is not allowed by filter options')
+          optionsError('Operator "' + notAllowedOperator + '" is not allowed by filter options');
         }
 
         angular.forEach(filter[operator], function (condition) {
           if (Object.prototype.hasOwnProperty.call(condition, 'and') || Object.prototype.hasOwnProperty.call(condition, 'or')) {
-            validateOperators(condition, operators)
+            validateOperators(condition, operators);
           }
 
           if (Object.prototype.hasOwnProperty.call(condition, 'filter')) {
-            validateOperators(condition.filter, operators)
+            validateOperators(condition.filter, operators);
           }
-        })
+        });
       }
 
       function validateAttributesBlacklist (filter, attributeBlacklist) {
         if (!angular.isArray(attributeBlacklist)) {
-          return
+          return;
         }
 
         if (!attributeBlacklist.length) {
-          return
+          return;
         }
 
-        var operator = getOperator(filter)
+        var operator = getOperator(filter);
 
         angular.forEach(filter[operator], function (condition) {
           if (Object.prototype.hasOwnProperty.call(condition, 'attribute') && attributeBlacklist.indexOf(condition.attribute) === 0) {
-            optionsError('Attribute "' + condition.attribute + '" is not allowed by filter options')
+            optionsError('Attribute "' + condition.attribute + '" is not allowed by filter options');
           }
 
           if (Object.prototype.hasOwnProperty.call(condition, 'and') || Object.prototype.hasOwnProperty.call(condition, 'or')) {
-            validateAttributesBlacklist(condition, attributeBlacklist)
+            validateAttributesBlacklist(condition, attributeBlacklist);
           }
 
           if (Object.prototype.hasOwnProperty.call(condition, 'filter')) {
-            validateAttributesBlacklist(condition.filter, attributeBlacklist)
+            validateAttributesBlacklist(condition.filter, attributeBlacklist);
           }
-        })
+        });
       }
 
       function validateFieldTypesBlacklist (filter, fieldTypeBlacklist, formId, forms) {
         if (!angular.isArray(fieldTypeBlacklist)) {
-          return
+          return;
         }
 
         if (!fieldTypeBlacklist.length) {
-          return
+          return;
         }
 
         if (!Object.prototype.hasOwnProperty.call(forms, formId)) {
-          return
+          return;
         }
 
-        var operator = getOperator(filter)
+        var operator = getOperator(filter);
 
         angular.forEach(filter[operator], function (condition) {
           if (Object.prototype.hasOwnProperty.call(condition, 'attribute') && Object.prototype.hasOwnProperty.call(forms[formId], 'fields')) {
-            var type = getAttributeType(condition.attribute, forms[formId].fields)
+            var type = getAttributeType(condition.attribute, forms[formId].fields);
             if (undefined !== type && fieldTypeBlacklist.indexOf(type) === 0) {
-              optionsError('Attribute "' + condition.attribute + '" which have type "' + type + '" is not allowed by filter options')
+              optionsError('Attribute "' + condition.attribute + '" which have type "' + type + '" is not allowed by filter options');
             }
           }
 
           if (Object.prototype.hasOwnProperty.call(condition, 'and') || Object.prototype.hasOwnProperty.call(condition, 'or')) {
-            validateFieldTypesBlacklist(condition, fieldTypeBlacklist, formId, forms)
+            validateFieldTypesBlacklist(condition, fieldTypeBlacklist, formId, forms);
           }
 
           if (Object.prototype.hasOwnProperty.call(condition, 'filter')) {
-            var subfilterFormId = condition.attribute.substring(4)
-            validateFieldTypesBlacklist(condition.filter, fieldTypeBlacklist, subfilterFormId, forms)
+            var subfilterFormId = condition.attribute.substring(4);
+            validateFieldTypesBlacklist(condition.filter, fieldTypeBlacklist, subfilterFormId, forms);
           }
-        })
+        });
       }
 
       return function (filter, options, forms) {
-        var operator = getOperator(filter)
+        var operator = getOperator(filter);
 
         if (operator === false) {
-          return
+          return;
         }
 
         if (!options) {
-          return
+          return;
         }
 
         if (!options.formId) {
-          return
+          return;
         }
 
         if (Object.prototype.hasOwnProperty.call(options, 'operators')) {
-          validateOperators(filter, options.operators)
+          validateOperators(filter, options.operators);
         }
 
         if (Object.prototype.hasOwnProperty.call(options, 'subfilters')) {
-          validateSubfilters(filter, options.subfilters)
+          validateSubfilters(filter, options.subfilters);
         }
 
         if (Object.prototype.hasOwnProperty.call(options, 'groups')) {
-          validateGroups(filter, options.groups)
+          validateGroups(filter, options.groups);
         }
 
         if (Object.prototype.hasOwnProperty.call(options, 'dynamicValues')) {
-          validateDynamicValues(filter, options.dynamicValues)
+          validateDynamicValues(filter, options.dynamicValues);
         }
 
         if (Object.prototype.hasOwnProperty.call(options, 'attributeBlacklist')) {
-          validateAttributesBlacklist(filter, options.attributeBlacklist)
+          validateAttributesBlacklist(filter, options.attributeBlacklist);
         }
 
         if (!forms) {
-          return
+          return;
         }
 
         if (Object.prototype.hasOwnProperty.call(options, 'fieldTypeBlacklist')) {
-          validateFieldTypesBlacklist(filter, options.fieldTypeBlacklist, options.formId, forms)
+          validateFieldTypesBlacklist(filter, options.fieldTypeBlacklist, options.formId, forms);
         }
-      }
+      };
     }])
     .service('znFiltersPanel', ['$rootScope', function ($rootScope) {
       return {
@@ -1020,13 +1020,13 @@ export function Services (plugin) {
             },
             callback: (err, filter) => {
               if (options.onSave) {
-                options.onSave(filter)
-                $rootScope.$apply()
+                options.onSave(filter);
+                $rootScope.$apply();
               }
             }
-          })
+          });
         }
-      }
+      };
     }])
     .service('znModal', ['$rootScope', function ($rootScope) {
 
@@ -1042,53 +1042,53 @@ export function Services (plugin) {
           closeButton: true,
           error: false,
           width: null,
-        }, options)
+        }, options);
 
         if (options.error) {
           options.header = angular.extend(options.header || {}, {
             icon: 'icon-attention',
             classes: 'message-alert'
-          })
+          });
 
-          options.classes = options.classes + ' app-error'
+          options.classes = options.classes + ' app-error';
         }
 
-        const events = []
-        const callbacks = {}
+        const events = [];
+        const callbacks = {};
 
         Object.keys(options.btns)
           .forEach(function (name) {
-            events.push(name)
+            events.push(name);
 
-            const hasAction = typeof options.btns[name].action === 'function'
+            const hasAction = typeof options.btns[name].action === 'function';
 
             if (hasAction) {
-              callbacks[name] = options.btns[name].action
-              options.btns[name].action = name
+              callbacks[name] = options.btns[name].action;
+              options.btns[name].action = name;
             }
 
             client.subscribe(name, (payload = {}) => {
               if (hasAction) {
-                callbacks[name](payload.data)
+                callbacks[name](payload.data);
               }
 
               if (options.btns[name].close !== false && !payload.keepOpen) {
-                client.call({ method: 'close-modal' })
+                client.call({ method: 'close-modal' });
               }
-            })
-          })
+            });
+          });
 
-        let isOpen = true
-        let width = options.width
+        let isOpen = true;
+        let width = options.width;
 
         if (!options.width && options.classes) {
 
           if (options.classes.indexOf('wide-modal') > -1) {
-            width = '80%'
+            width = '80%';
           } else if (options.classes.indexOf('modal-filter-panel') > -1) {
-            width = '830px'
+            width = '830px';
           } else if (options.classes.indexOf('modal-narrow') > -1) {
-            width = '450px'
+            width = '450px';
           }
 
         }
@@ -1105,26 +1105,26 @@ export function Services (plugin) {
           },
           callback: () => {
             if (typeof options.afterClose === 'function' && isOpen) {
-              options.afterClose()
+              options.afterClose();
             }
 
-            $rootScope.$apply()
+            $rootScope.$apply();
 
-            isOpen = false
+            isOpen = false;
           }
-        })
+        });
 
         return {
           close: function () {
             if (typeof options.afterClose === 'function' && isOpen) {
-              options.afterClose()
+              options.afterClose();
             }
 
-            $rootScope.$apply()
+            $rootScope.$apply();
 
-            isOpen = false
+            isOpen = false;
           }
-        }
-      }
-    }])
+        };
+      };
+    }]);
 }
