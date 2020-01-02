@@ -188,9 +188,121 @@ Therefore, this project forms the basis for converting "legacy" plugins into ful
         }])
         ```
 
-    - certain usages of `znModal`:
+    - certain usages of `znModal` will need to be refactored:
       - accessing `$scope` properties that are functions. If you are passing the entire `$scope` to the modal and it contains functions, but you aren't using those functions in the modal, no refactor is necessary.
-      - accessing `$scope` properties defined one or more levels up the scope inheritance tree.
+      
+        Example:
+
+        ```js
+        plugin.controller('myController', ['$scope', 'znModal', function ($scope, znModal) {
+          
+          $scope.someFunction = function() { 
+            console.log('hey!')
+          }
+                    
+          znModal({
+            template: '<div ng-click="someFunction()"></div>',
+            scope: $scope
+          })
+        }])
+        ```
+
+        Fix:
+
+        ```js
+        plugin.controller('myController', ['$scope', 'znModal', function ($scope, znModal) {          
+          znModal({
+            template: '<div ng-controller="modalController"><div ng-click="someFunction()"></div></div>',
+            scope: $scope
+          })
+        }])
+        .controller('modalController', ['$scope', function ($scope) {
+          $scope.someFunction = function() { 
+            console.log('hey!')
+          }
+        }]) 
+        ```
+
+      
+      - accessing `$scope` properties inherited from one or more levels up the scope tree.
+      
+        Example:
+
+        ```js
+        plugin.controller('myController', ['$scope', 'znModal', function ($scope, znModal) {
+          znModal({
+            template: '<div>{{someParentScopeProperty}}</div>',
+            scope: $scope
+          })
+        }])
+        ```
+
+        Fix:
+
+        ```js
+        plugin.controller('myController', ['$scope', 'znModal', function ($scope, znModal) {          
+          znModal({
+            template: '<div>{{someParentScopeProperty}}</div>',
+            scope: {
+              someParentScopeProperty: $scope.someParentScopeProperty
+            }
+          })
+        }])
+        ```
+
+      
+      - in the parent context, trying to access properties that were manipulated in the modal. To fix this, refactor to use `setBtnAction` in the modal controller and pass any data needed by the parent through that button callback.
+      
+        Example:
+
+        ```js
+        plugin.controller('myController', ['$scope', 'znModal', function ($scope, znModal) {
+          
+          $scope.modalData = {};
+          
+          znModal({
+            template: '<div ng-init="modalData.prop = 123"></div>',
+            scope: $scope,
+            btns: {
+                'Save': {
+                   primary: true,
+                   action: function() {
+                     console.log($scope.modalData.prop)
+                   }
+                }
+            }
+          })
+        }])
+        ```
+
+        Fix:
+
+        ```js
+        plugin.controller('myController', ['$scope', 'znModal', function ($scope, znModal) {
+                    
+          znModal({
+            template: '<div ng-init="modalData.prop = 123"></div>',
+            scope: $scope,
+            btns: {
+                'Save': {
+                   primary: true,
+                   action: function(modalData) {
+                     console.log(modalData.prop)
+                   }
+                }
+            }
+          })
+        }])
+        .controller('modalController', ['$scope', function ($scope) {
+          $scope.modalData = {}
+          
+          $scope.setBtnAction('Save', function(callback) {
+            callback($scope.modalData)
+          })
+        }]) 
+        ```
+
+      
       - using a custom defined css class to set the modal width. The custom classes will continue to apply other styling, but it won't affect the width.
     
         Example:
@@ -203,15 +315,10 @@ Therefore, this project forms the basis for converting "legacy" plugins into ful
 
         ```js
         plugin.controller('myController', ['$scope', 'znModal', function ($scope, znModal) {
-          
-          $scope.someFunction = function() { 
-            console.log('hey!')
-          }
-          
+                    
           znModal({
-            template: '<div ng-click="someFunction()">{{someParentScopeProperty}}</div>',
-            classes: 'custom-css-width-class',
-            scope: $scope
+            template: '<div>Hello</div>',
+            classes: 'custom-css-width-class'
           })
         }])
         ```
@@ -220,19 +327,12 @@ Therefore, this project forms the basis for converting "legacy" plugins into ful
 
         ```js
         plugin.controller('myController', ['$scope', 'znModal', function ($scope, znModal) {
-          $scope.someParentScopeProperty = 123
           
           znModal({
-            template: '<div ng-controller="modalController"><div ng-click="someFunction()">{{someParentScopeProperty}}</div></div>',
-            width: '100px',
-            scope: $scope
+            template: '<div>Hello</div>',
+            width: '100px'
           })
         }])
-        .controller('modalController', ['$scope', function ($scope) {
-          $scope.someFunction = function() { 
-            console.log('hey!')
-          }
-        }]) 
         ```
 
     
