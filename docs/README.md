@@ -188,8 +188,57 @@ Therefore, this project forms the basis for converting "legacy" plugins into ful
         }])
         ```
 
-    - `znModal` or custom modals
+    - certain usages of `znModal`:
+      - accessing `$scope` properties that are functions. If you are passing the entire `$scope` to the modal and it contains functions, but you aren't using those functions in the modal, no refactor is necessary.
+      - accessing `$scope` properties defined one or more levels up the scope inheritance tree.
+      - using a custom defined css class to set the modal width. The custom classes will continue to apply other styling, but it won't affect the width.
+    
+        Example:
 
+        ``` css 
+        .custom-css-wdth-class {
+          width: 100px
+        }
+        ```
+
+        ```js
+        plugin.controller('myController', ['$scope', 'znModal', function ($scope, znModal) {
+          
+          $scope.someFunction = function() { 
+            console.log('hey!')
+          }
+          
+          znModal({
+            template: '<div ng-click="someFunction()">{{someParentScopeProperty}}</div>',
+            classes: 'custom-css-width-class',
+            scope: $scope
+          })
+        }])
+        ```
+
+        Fix:
+
+        ```js
+        plugin.controller('myController', ['$scope', 'znModal', function ($scope, znModal) {
+          $scope.someParentScopeProperty = 123
+          
+          znModal({
+            template: '<div ng-controller="modalController"><div ng-click="someFunction()">{{someParentScopeProperty}}</div></div>',
+            width: '100px',
+            scope: $scope
+          })
+        }])
+        .controller('modalController', ['$scope', function ($scope) {
+          $scope.someFunction = function() { 
+            console.log('hey!')
+          }
+        }]) 
+        ```
+
+    
+    - custom modals. If you are using a regular Bootstrap modal without `znModal`, the grey backdrop won't span the entire page. It will be bound by the dimensions of iframe. Refactor to use `znModal`
+
+    - using $location in `$scope.$on('$destroy')`. You can no longer clear query/hash params when the user leaves the plugin
     - **Patterns that don't work in Version 2 and are only fixable by non-trivial refactoring:**
 
         - Setting global variables to communicate between individual interfaces of same plugin
