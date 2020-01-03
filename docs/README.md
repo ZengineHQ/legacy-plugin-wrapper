@@ -189,6 +189,7 @@ Therefore, this project forms the basis for converting "legacy" plugins into ful
         ```
 
     - certain usages of `znModal` will need to be refactored:
+      - opening a second modal before the first one is closed
       - accessing `$scope` properties that are functions. If you are passing the entire `$scope` to the modal and it contains functions, but you aren't using those functions in the modal, no refactor is necessary.
       
         Example:
