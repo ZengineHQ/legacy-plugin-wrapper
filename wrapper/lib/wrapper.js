@@ -29,6 +29,10 @@ plugin.sizer = new ContentSizer(async dimensions => {
   return result;
 });
 
+window.addEventListener('beforeunload', () => {
+  client.call({ method: 'reload-frames' });
+});
+
 function sleep (ms) {
   return new Promise((resolve) => {
     setTimeout(() => resolve(), ms);
