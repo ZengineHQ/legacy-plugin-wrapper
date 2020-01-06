@@ -2,7 +2,7 @@ import '@babel/polyfill';
 import ZnFilterMatcher from 'zn-filter-matcher';
 import Client from '@zenginehq/post-rpc-client';
 import ContentSizer from 'content-sizer';
-import { sanitizeForPostMessage } from './utils'
+import { sanitizeForPostMessage } from './utils';
 
 var plugin = {};
 
@@ -141,7 +141,15 @@ async function compileProviderIsReady () {
       return {
         restrict: 'A',
         scope: {},
-        link: function () {
+        link: function (scope) {
+
+          client.subscribe('locationChange', ({ next, previous }) => {
+            if (context) {
+              context.location = next;
+              scope.$apply();
+            }
+          });
+
           angular.forEach(context, (value, key) => {
             $rootScope[key] = value;
           });
@@ -373,9 +381,6 @@ async function compileProviderIsReady () {
     }])
     .service('znPluginData', ['$q', function ($q) {
       return function (namespace) {
-        if (namespace === 'wgn') { // this will never actually happen
-          namespace = context.plugin.namespace;
-        }
 
         function request (method, route, options, data, successCb, errorCb) {
           if (data) {
@@ -501,44 +506,43 @@ async function compileProviderIsReady () {
       return angular.extend({}, context.location.pathParams, context.location.searchParams, routeParams);
     }])
     .service('$location', [function () {
-      const znLocation = context.location;
       const locationAsync = (method, args) => {
         args = args || [];
         return client.call({ method: 'location', args: { method, args } });
       };
 
       return {
-        host: () => { return znLocation.host; },
-        protocol: () => { return znLocation.protocol; },
-        port: () => { return znLocation.port; },
-        absUrl: () => { return znLocation.href; },
+        host: () => { return context.location.host; },
+        protocol: () => { return context.location.protocol; },
+        port: () => { return context.location.port; },
+        absUrl: () => { return context.location.href; },
         hash: (...args) => {
           if (args.length) {
             locationAsync('hash', args);
           } else {
-            return znLocation.hash;
+            return context.location.hash;
           }
         },
         search: (...args) => {
           if (args.length) {
             locationAsync('searchParams', args);
           } else {
-            return znLocation.searchParams;
+            return context.location.searchParams;
           }
         },
         url: (...args) => {
           if (args.length) {
             locationAsync('navigate', args);
           } else {
-            var index = znLocation.href.indexOf(znLocation.pathname);
-            return znLocation.href.substr(index, znLocation.href.length);
+            var index = context.location.href.indexOf(context.location.pathname);
+            return context.location.href.substr(index, context.location.href.length);
           }
         },
         path: (...args) => {
           if (args.length) {
             locationAsync('navigate', args);
           } else {
-            return znLocation.pathname;
+            return context.location.pathname;
           }
         }
       };
