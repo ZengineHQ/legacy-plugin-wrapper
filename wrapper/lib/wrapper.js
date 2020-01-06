@@ -29,6 +29,10 @@ plugin.sizer = new ContentSizer(async dimensions => {
   return result;
 });
 
+window.addEventListener('beforeunload', () => {
+  client.call({ method: 'reload-frames' });
+});
+
 function sleep (ms) {
   return new Promise((resolve) => {
     setTimeout(() => resolve(), ms);
@@ -320,8 +324,9 @@ async function compileProviderIsReady () {
 
         const sendStuff = name => (data, keepOpen) => {
           client.call({
-            method: name,
+            method: 'child-to-parent',
             args: {
+              key: name,
               payload: {
                 data: sanitizeForPostMessage(data),
                 keepOpen
@@ -347,13 +352,12 @@ async function compileProviderIsReady () {
           if (btn.action) {
             $scope.callbacks[name] = function () {
               client.call({
-                method: name,
-                args: { payload: {} }
+                method: 'child-to-parent',
+                args: { key: name, payload: {} }
               });
             };
           } else {
             $scope.callbacks[name] = function () {
-
               if (btn.close !== false) {
                 $scope.close();
               }
@@ -363,10 +367,10 @@ async function compileProviderIsReady () {
       });
 
       $scope.close = function () {
-        client.call({ method: 'close', args: { payload: {} } });
+        client.call({ method: 'close', args: { key: 'close', payload: {} } });
       };
 
-      $scope.$on('destroy', () => {
+      $scope.$on('$destroy', () => {
         window.removeEventListener('keydown', escListener);
       });
 
