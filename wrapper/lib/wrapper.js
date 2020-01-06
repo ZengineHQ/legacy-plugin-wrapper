@@ -318,6 +318,8 @@ async function compileProviderIsReady () {
 
           if ($scope.closeButton !== false) {
             window.addEventListener('keydown', escListener);
+            window.focus();
+            client.subscribe('esc', () => $scope.close());
           }
 
           if (seedData.template && !seedData.templateUrl) {
@@ -352,7 +354,6 @@ async function compileProviderIsReady () {
         $scope.callbacks = {};
 
         angular.forEach(seedData.btns, (btn, name) => {
-
           if (btn.template) {
             $templateCache.put(name, btn.template);
           }
@@ -380,8 +381,8 @@ async function compileProviderIsReady () {
 
       $scope.$on('$destroy', () => {
         window.removeEventListener('keydown', escListener);
+        client.unsubscribe('esc');
       });
-
     }])
     .service('znPluginData', ['$q', function ($q) {
       return function (namespace) {
