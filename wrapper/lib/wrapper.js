@@ -320,8 +320,9 @@ async function compileProviderIsReady () {
 
         const sendStuff = name => (data, keepOpen) => {
           client.call({
-            method: name,
+            method: 'child-to-parent',
             args: {
+              key: name,
               payload: {
                 data: sanitizeForPostMessage(data),
                 keepOpen

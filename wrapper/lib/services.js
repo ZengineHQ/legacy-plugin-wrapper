@@ -966,7 +966,9 @@ export function Services (plugin) {
             }
 
             client.subscribe(name, ({ fromChildId, data = {} }) => {
-              if (fromChildId !== modalId) return
+              if (fromChildId !== modalId) {
+                return;
+              }
 
               if (hasAction) {
                 callbacks[name](data.data);
@@ -1002,7 +1004,7 @@ export function Services (plugin) {
               width: width
             }
           },
-          callback: id => {
+          callback: (err, id) => {
             modalId = id;
           }
         });
