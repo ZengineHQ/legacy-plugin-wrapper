@@ -930,6 +930,8 @@ export function Services (plugin) {
     .service('znModal', ['$rootScope', function ($rootScope) {
 
       return function (options) {
+        let modalId = '';
+
         options = angular.extend({
           title: 'Dialog',
           template: '',
@@ -952,13 +954,10 @@ export function Services (plugin) {
           options.classes = options.classes + ' app-error';
         }
 
-        const events = [];
         const callbacks = {};
 
         Object.keys(options.btns)
-          .forEach(function (name) {
-            events.push(name);
-
+          .forEach(name => {
             const hasAction = typeof options.btns[name].action === 'function';
 
             if (hasAction) {
@@ -966,13 +965,15 @@ export function Services (plugin) {
               options.btns[name].action = name;
             }
 
-            client.subscribe(name, (payload = {}) => {
+            client.subscribe(name, ({ fromChildId, data = {} }) => {
+              if (fromChildId !== modalId) return
+
               if (hasAction) {
-                callbacks[name](payload.data);
+                callbacks[name](data.data);
               }
 
-              if (options.btns[name].close !== false && !payload.keepOpen) {
-                client.call({ method: 'close-modal' });
+              if (options.btns[name].close !== false && !data.keepOpen) {
+                client.call({ method: 'close-child', args: { id: modalId } });
               }
             });
           });
@@ -997,21 +998,24 @@ export function Services (plugin) {
           args: {
             options: {
               src: '/index.html',
-              events: events,
               context: sanitizeForPostMessage(options),
               width: width
             }
           },
-          callback: () => {
-            if (typeof options.afterClose === 'function' && isOpen) {
-              options.afterClose();
-            }
-
-            $rootScope.$apply();
-
-            isOpen = false;
+          callback: id => {
+            modalId = id;
           }
         });
+
+        client.subscribe('close', () => {
+          if (typeof options.afterClose === 'function' && isOpen) {
+            options.afterClose();
+          }
+
+          $rootScope.$apply();
+
+          isOpen = false;
+        })
 
         return {
           close: function () {
