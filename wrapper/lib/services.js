@@ -1,5 +1,5 @@
 import { client } from './wrapper';
-import { sanitizeForPostMessage } from './utils'
+import { sanitizeForPostMessage } from './utils';
 
 export function Services (plugin) {
   plugin

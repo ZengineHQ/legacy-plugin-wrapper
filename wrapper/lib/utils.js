@@ -97,4 +97,4 @@ export const sanitizeForPostMessage = obj => {
   }
 
   return sanitize(obj);
-}
+};
