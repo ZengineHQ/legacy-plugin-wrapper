@@ -353,6 +353,8 @@ async function compileProviderIsReady () {
 
         $scope.callbacks = {};
 
+        $scope.cancelButton = Object.keys(seedData.btns).length;
+
         angular.forEach(seedData.btns, (btn, name) => {
           if (btn.template) {
             $templateCache.put(name, btn.template);
