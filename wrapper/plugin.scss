@@ -50,4 +50,97 @@ body {
   left: unset;
 }
 
+/* toolbar */
+.mce-toolbar-grp {
+	background-color: #f0f0f0 !important; /* uses !important or override .mce-panel background-color/image */
+	background-image: none !important;
+}
+
+/* text color */
+#tinymce {
+	color: #000;
+}
+
+/* button text color */
+.mce-ico {
+	color: #000;
+}
+
+/* button background color */
+.mce-btn button {
+	background-color: #f0f0f0;
+}
+
+#mce-modal-block.mce-in {
+	background-color: #000 !important;
+}
+
+.mce-primary button {
+	background-color:#2d8ac7;
+}
+
+.mce-primary button span.mce-txt {
+	color:#fff;
+}
+
+.mce-panel {
+	border: 0 solid #c5c5c5;
+	background-color: #f0f0f0 !important;
+}
+
+.mce-btn {
+	background-color: #f0f0f0 !important;
+}
+
+.mce-btn button,
+.mce-btn.mce-active button i {
+	color: #595959 !important;
+}
+
+.mce-menu-item {
+  background-color: #fff !important;
+}
+
+.mce-btn .mce-caret,
+.mce-btn:hover .mce-caret,
+.mce-btn.mce-active .mce-caret,
+.mce-btn.mce-active:hover .mce-caret {
+  border-top-color: #333 !important;
+}
+
+.mce-btn.mce-active,
+.mce-btn.mce-active:hover {
+  background-color: #dbdbdb !important;
+  border-color: #ccc !important;
+}
+
+.mce-btn.mce-active button,
+.mce-btn.mce-active:hover button {
+  background-color: #dbdbdb !important;
+  border-color: #ccc !important;
+}
+
+.mce-menu-item:hover,
+.mce-menu-item.mce-selected,
+.mce-menu-item:focus {
+  text-decoration: none !important;
+  color: #fff !important;
+  background-color: #2d8ac7 !important;
+}
+
+.mce-menu-item:hover .mce-text,
+.mce-menu-item.mce-selected .mce-text,
+.mce-menu-item:focus .mce-text {
+  color: #fff !important;
+}
+
+.mce-menu-item-normal.mce-active {
+  background-color: #3498db !important;
+}
+
+.mce-window,
+.mce-window .mce-foot {
+  background: #fff !important;
+}
+
 /* PLUGIN_CSS */
