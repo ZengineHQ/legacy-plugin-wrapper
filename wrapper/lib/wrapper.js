@@ -147,7 +147,7 @@ async function compileProviderIsReady () {
         scope: {},
         link: function (scope) {
 
-          client.subscribe('locationChange', ({ next, previous }) => {
+          client.subscribe('locationChange', ({ next }) => {
             if (context) {
               context.location = next;
               scope.$apply();
