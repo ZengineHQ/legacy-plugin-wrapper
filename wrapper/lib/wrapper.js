@@ -147,7 +147,7 @@ async function compileProviderIsReady () {
         scope: {},
         link: function (scope) {
 
-          client.subscribe('locationChange', ({ next, previous }) => {
+          client.subscribe('locationChange', ({ next }) => {
             if (context) {
               context.location = next;
               scope.$apply();
@@ -350,6 +350,8 @@ async function compileProviderIsReady () {
         };
 
         $scope.callbacks = {};
+
+        $scope.cancelButton = Object.keys(seedData.btns).length;
 
         angular.forEach(seedData.btns, (btn, name) => {
 

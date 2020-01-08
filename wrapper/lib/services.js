@@ -1017,7 +1017,7 @@ export function Services (plugin) {
           $rootScope.$apply();
 
           isOpen = false;
-        })
+        });
 
         return {
           close: function () {
