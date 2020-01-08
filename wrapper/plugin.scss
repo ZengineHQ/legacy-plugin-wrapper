@@ -1,5 +1,3 @@
-@import 'tinymce/skins/lightgray/content.min.css';
-@import 'tinymce/skins/lightgray/skin.min.css';
 @import 'ng-grid/ng-grid.min.css';
 @import 'ui-select/dist/select.min.css';
 @import './css/bootstrap.css';
@@ -83,9 +81,8 @@ body {
 	color:#fff;
 }
 
-.mce-panel {
-	border: 0 solid #c5c5c5;
-	background-color: #f0f0f0 !important;
+.mce-statusbar {
+  background-color: #f0f0f0 !important;
 }
 
 .mce-btn {
