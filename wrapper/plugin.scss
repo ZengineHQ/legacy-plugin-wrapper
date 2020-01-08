@@ -98,7 +98,7 @@ body {
 }
 
 .mce-menu-item {
-	background-color: #fff !important;
+  background-color: #fff !important;
 }
 
 .mce-btn .mce-caret,
@@ -131,11 +131,16 @@ body {
 .mce-menu-item:hover .mce-text,
 .mce-menu-item.mce-selected .mce-text,
 .mce-menu-item:focus .mce-text {
-	color: #fff !important;
+  color: #fff !important;
 }
 
 .mce-menu-item-normal.mce-active {
   background-color: #3498db !important;
+}
+
+.mce-window,
+.mce-window .mce-foot {
+  background: #fff !important;
 }
 
 /* PLUGIN_CSS */
