@@ -16,7 +16,11 @@ Function.prototype.curry = Function.prototype.curry || function () {
 
 const parentOrigin = (document.location.ancestorOrigins && document.location.ancestorOrigins[0]) || document.referrer || 'https://platform.zenginehq.com';
 
-export const client = new Client(parentOrigin);
+// parse base url from document.referrer
+const parent = document.createElement('a');
+parent.href = parentOrigin;
+
+export const client = new Client(parent.origin);
 client.start();
 
 const znResize = dimensions => client.call({ method: 'resize', args: { dimensions } });
