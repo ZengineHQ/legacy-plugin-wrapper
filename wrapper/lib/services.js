@@ -1,5 +1,5 @@
 import { client } from './wrapper';
-import { sanitizeForPostMessage } from './utils';
+import { sanitizeForPostMessage, sleep } from './utils';
 
 export function Services (plugin) {
   plugin
@@ -1020,7 +1020,23 @@ export function Services (plugin) {
         });
 
         return {
-          close: function () {
+          close: async function () {
+
+            async function modalIdIsReady () {
+              if (modalId) {
+                return;
+              }
+
+              // if we have to wait, we'll wait no longer than a 60fps frame before checking again #perf
+              await sleep(16);
+
+              return modalIdIsReady();
+            }
+
+            await modalIdIsReady();
+
+            client.call({ method: 'close-child', args: { id: modalId } });
+
             if (typeof options.afterClose === 'function' && isOpen) {
               options.afterClose();
             }
