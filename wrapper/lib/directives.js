@@ -2043,7 +2043,7 @@ export function Directives (plugin) {
       };
     }]);
 
-    function href($location) {
+    function href ($location) {
       return {
         restrict: 'A',
         scope: {
@@ -2071,7 +2071,7 @@ export function Directives (plugin) {
                 if (url.indexOf('/' !== 0)) {
                   url = '/' + url;
                 }
-                url = $location.path() + url
+                url = $location.path() + url;
               }
 
               $location.url(url);

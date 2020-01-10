@@ -1,3 +1,9 @@
+export const sleep = (ms) => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), ms);
+  });
+};
+
 export const sanitizeForPostMessage = obj => {
   const referenceMap = new Map();
 
