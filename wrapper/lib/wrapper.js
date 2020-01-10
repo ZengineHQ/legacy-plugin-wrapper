@@ -14,11 +14,18 @@ Function.prototype.curry = Function.prototype.curry || function () {
   };
 };
 
-const parentOrigin = (document.location.ancestorOrigins && document.location.ancestorOrigins[0]) || document.referrer || 'https://platform.zenginehq.com';
+const parentOrigin = (document.location.ancestorOrigins && document.location.ancestorOrigins[0]) || getReferrerOrigin() || 'https://platform.zenginehq.com';
 
-// parse base url from document.referrer
-const parent = document.createElement('a');
-parent.href = parentOrigin;
+function getReferrerOrigin () {
+  if (document.referrer) {
+    const link = document.createElement('a');
+    link.href = document.referrer;
+
+    return link.origin;
+  } else {
+    return '';
+  }
+}
 
 export const client = new Client(parent.origin);
 client.start();
