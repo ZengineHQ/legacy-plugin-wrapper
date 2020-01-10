@@ -2043,46 +2043,47 @@ export function Directives (plugin) {
       };
     }]);
 
-    function href($location) {
-      return {
-        restrict: 'A',
-        scope: {
-          relative: '='
-        },
-        link: function (scope, element, attrs) {
-          element.bind('click', e => {
+  function href($location) {
+    return {
+      restrict: 'A',
+      scope: {
+        relative: '='
+      },
+      link: function (scope, element, attrs) {
+        element.bind('click', e => {
 
-            const platformUrl = $location.protocol() + '://' + $location.host();
-            let url = attrs.href;
-            const withinPlatform = url.indexOf(platformUrl) === 0;
+          const platformUrl = $location.protocol() + '://' + $location.host();
+          let url = attrs.href;
+          const withinPlatform = url.indexOf(platformUrl) === 0;
 
-            // open external links in new tab
-            if (url.match(/^https?|www|mailto|\/\//) &&
-              (url.indexOf(platformUrl) === -1 || attrs.target === '_blank')) {
-              e.preventDefault();
-              return window.open(url, attrs.target || '_top');
-            } else if (url.match(/^\/|\?|#/) || withinPlatform || scope.relative) {
-              e.preventDefault();
-              if (withinPlatform) {
-                url = url.replace(platformUrl, '');
-              }
-
-              if (scope.relative) {
-                if (url.indexOf('/' !== 0)) {
-                  url = '/' + url;
-                }
-                url = $location.path() + url
-              }
-
-              $location.url(url);
-
+          // open external links in new tab
+          if (url.match(/^https?|www|mailto|\/\//) &&
+            (url.indexOf(platformUrl) === -1 || attrs.target === '_blank')) {
+            e.preventDefault();
+            return window.open(url, attrs.target || '_top');
+          } else if (url.match(/^\/|\?|#/) || withinPlatform || scope.relative) {
+            e.preventDefault();
+            if (withinPlatform) {
+              url = url.replace(platformUrl, '');
             }
 
-          });
-        }
-      };
-    }
-    plugin.directive('href', ['$location', href])
+            if (scope.relative) {
+              if (url.indexOf('/' !== 0)) {
+                url = '/' + url;
+              }
+              url = $location.path() + url
+            }
+
+            $location.url(url);
+
+          }
+
+        });
+      }
+    };
+  }
+
+  plugin.directive('href', ['$location', href])
     .directive('ngHref', ['$location', href])
     .directive('znTooltip', [function () {
       return {
