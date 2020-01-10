@@ -14,7 +14,20 @@ Function.prototype.curry = Function.prototype.curry || function () {
   };
 };
 
-export const client = new Client(document.location.ancestorOrigins[0]);
+const parentOrigin = (document.location.ancestorOrigins && document.location.ancestorOrigins[0]) || getReferrerOrigin() || 'https://platform.zenginehq.com';
+
+function getReferrerOrigin () {
+  if (document.referrer) {
+    const link = document.createElement('a');
+    link.href = document.referrer;
+
+    return link.origin;
+  } else {
+    return '';
+  }
+}
+
+export const client = new Client(parentOrigin);
 client.start();
 
 const znResize = dimensions => client.call({ method: 'resize', args: { dimensions } });
