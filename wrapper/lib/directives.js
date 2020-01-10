@@ -2051,7 +2051,6 @@ export function Directives (plugin) {
       },
       link: function (scope, element, attrs) {
         element.bind('click', e => {
-
           const platformUrl = $location.protocol() + '://' + $location.host();
           let url = attrs.href;
           const withinPlatform = url.indexOf(platformUrl) === 0;
@@ -2060,9 +2059,11 @@ export function Directives (plugin) {
           if (url.match(/^https?|www|mailto|\/\//) &&
             (url.indexOf(platformUrl) === -1 || attrs.target === '_blank')) {
             e.preventDefault();
+
             return window.open(url, attrs.target || '_top');
           } else if (url.match(/^\/|\?|#/) || withinPlatform || scope.relative) {
             e.preventDefault();
+
             if (withinPlatform) {
               url = url.replace(platformUrl, '');
             }
@@ -2071,13 +2072,12 @@ export function Directives (plugin) {
               if (url.indexOf('/' !== 0)) {
                 url = '/' + url;
               }
-              url = $location.path() + url
+
+              url = $location.path() + url;
             }
 
             $location.url(url);
-
           }
-
         });
       }
     };

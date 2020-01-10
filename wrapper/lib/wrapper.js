@@ -2,7 +2,7 @@ import '@babel/polyfill';
 import ZnFilterMatcher from 'zn-filter-matcher';
 import Client from '@zenginehq/post-rpc-client';
 import ContentSizer from 'content-sizer';
-import { sanitizeForPostMessage } from './utils';
+import { sanitizeForPostMessage, sleep } from './utils';
 
 var plugin = {};
 
@@ -45,12 +45,6 @@ plugin.sizer = new ContentSizer(async dimensions => {
 window.addEventListener('beforeunload', () => {
   client.call({ method: 'reload-frames' });
 });
-
-function sleep (ms) {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), ms);
-  });
-}
 
 async function compileProviderIsReady () {
   if (plugin.compileProvider) {
