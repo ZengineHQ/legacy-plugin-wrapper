@@ -27,7 +27,7 @@ function getReferrerOrigin () {
   }
 }
 
-export const client = new Client(parent.origin);
+export const client = new Client(parentOrigin);
 client.start();
 
 const znResize = dimensions => client.call({ method: 'resize', args: { dimensions } });
