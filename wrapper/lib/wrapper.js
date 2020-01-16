@@ -207,6 +207,9 @@ async function compileProviderIsReady () {
     'firebase',
     'LocalStorageModule'
   ])
+    .value('uiTinymceConfig', {
+      baseUrl: location.origin
+    })
     .config(['$compileProvider', function ($compileProvider) {
       plugin.compileProvider = $compileProvider;
     }])
