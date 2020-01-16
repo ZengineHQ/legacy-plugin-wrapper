@@ -21,7 +21,7 @@ function getReferrerOrigin () {
     const link = document.createElement('a');
     link.href = document.referrer;
 
-    return link.origin;
+    return link.origin || (link.protocol + '//' + link.hostname);
   } else {
     return '';
   }

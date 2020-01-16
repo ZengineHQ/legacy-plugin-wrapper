@@ -256,6 +256,9 @@ export function ZnData (plugin) {
         data = {};
       }
 
+      // So modded/deleted params on #265 don't make it back to caller
+      params = angular.copy(params);
+
       let url = path;
 
       angular.forEach(pathParams, pathParam => {
