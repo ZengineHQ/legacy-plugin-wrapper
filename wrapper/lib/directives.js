@@ -2043,7 +2043,7 @@ export function Directives (plugin) {
       };
     }]);
 
-  function href($location) {
+  function href ($location) {
     return {
       restrict: 'A',
       scope: {
