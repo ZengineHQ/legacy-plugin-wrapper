@@ -23,6 +23,11 @@ body {
 	padding: .5em 63px 2em;
 }
 
+.wrapper-modal {
+  height: 100%;
+  margin: 0;
+}
+
 /* toolbar */
 .mce-toolbar-grp {
 	background-color: #f0f0f0 !important; /* uses !important or override .mce-panel background-color/image */
