@@ -23,29 +23,9 @@ body {
 	padding: .5em 63px 2em;
 }
 
-.modal {
-  display: block;
-  z-index: 1050;
-  width: 100%;
+.wrapper-modal {
   height: 100%;
-  background-color: unset;
-  border: unset;
-  -webkit-border-radius: unset;
-  -moz-border-radius: unset;
-  border-radius: unset;
-  -webkit-box-shadow: unset;
-  -moz-box-shadow: unset;
-  box-shadow: unset;
-  -webkit-background-clip: unset;
-  -moz-background-clip: unset;
-  background-clip: unset;
-  bottom: unset;
-  overflow-x: unset;
-  overflow-y: unset;
-  margin-left: unset;
-  position: unset;
-  top: unset;
-  left: unset;
+  margin: 0;
 }
 
 /* toolbar */
