@@ -43,7 +43,7 @@ plugin.sizer = new ContentSizer(async dimensions => {
 });
 
 window.addEventListener('beforeunload', () => {
-  client.call({ method: 'reload-frames' });
+  client.call({ method: 'reloadFrames' });
 });
 
 async function compileProviderIsReady () {
@@ -344,7 +344,7 @@ async function compileProviderIsReady () {
 
         const sendStuff = name => (data, keepOpen) => {
           client.call({
-            method: 'child-to-parent',
+            method: 'childToParent',
             args: {
               key: name,
               payload: {
@@ -384,7 +384,7 @@ async function compileProviderIsReady () {
           if (btn.action) {
             $scope.callbacks[btn.name] = function () {
               client.call({
-                method: 'child-to-parent',
+                method: 'childToParent',
                 args: { key: btn.name, payload: {} }
               });
             };

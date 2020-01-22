@@ -979,7 +979,7 @@ export function Services (plugin) {
               }
 
               if (options.btns[key].close !== false && !data.keepOpen) {
-                client.call({ method: 'close-child', args: { id: modalId } });
+                client.call({ method: 'closeChild', args: { id: modalId } });
               }
             });
           });
@@ -1039,7 +1039,7 @@ export function Services (plugin) {
 
             await modalIdIsReady();
 
-            client.call({ method: 'close-child', args: { id: modalId } });
+            client.call({ method: 'closeChild', args: { id: modalId } });
 
             if (typeof options.afterClose === 'function' && isOpen) {
               options.afterClose();
