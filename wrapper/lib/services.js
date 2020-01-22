@@ -957,12 +957,16 @@ export function Services (plugin) {
         const callbacks = {};
 
         Object.keys(options.btns)
-          .forEach(name => {
-            const hasAction = typeof options.btns[name].action === 'function';
+          .forEach(key => {
+            let name = key;
+            if (options.btns[key].name) {
+              name = options.btns[key].name;
+            }
+            const hasAction = typeof options.btns[key].action === 'function';
 
             if (hasAction) {
-              callbacks[name] = options.btns[name].action;
-              options.btns[name].action = name;
+              callbacks[name] = options.btns[key].action;
+              options.btns[key].action = name;
             }
 
             client.subscribe(name, ({ fromChildId, data = {} }) => {
@@ -974,8 +978,8 @@ export function Services (plugin) {
                 callbacks[name](data.data);
               }
 
-              if (options.btns[name].close !== false && !data.keepOpen) {
-                client.call({ method: 'close-child', args: { id: modalId } });
+              if (options.btns[key].close !== false && !data.keepOpen) {
+                client.call({ method: 'closeChild', args: { id: modalId } });
               }
             });
           });
@@ -1035,7 +1039,7 @@ export function Services (plugin) {
 
             await modalIdIsReady();
 
-            client.call({ method: 'close-child', args: { id: modalId } });
+            client.call({ method: 'closeChild', args: { id: modalId } });
 
             if (typeof options.afterClose === 'function' && isOpen) {
               options.afterClose();

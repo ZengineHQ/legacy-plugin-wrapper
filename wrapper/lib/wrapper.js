@@ -43,7 +43,7 @@ plugin.sizer = new ContentSizer(async dimensions => {
 });
 
 window.addEventListener('beforeunload', () => {
-  client.call({ method: 'reload-frames' });
+  client.call({ method: 'reloadFrames' });
 });
 
 async function compileProviderIsReady () {
@@ -338,13 +338,14 @@ async function compileProviderIsReady () {
           }
 
           $scope.setBtnDisabled = (name, disabled = true) => {
-            $scope.btns[name].disabled = disabled;
+            const btn = $scope.btns.find(b => b.name === name);
+            if (btn) btn.disabled = disabled;
           };
         }
 
         const sendStuff = name => (data, keepOpen) => {
           client.call({
-            method: 'child-to-parent',
+            method: 'childToParent',
             args: {
               key: name,
               payload: {
@@ -365,20 +366,31 @@ async function compileProviderIsReady () {
 
         $scope.cancelButton = Object.keys(seedData.btns).length;
 
-        angular.forEach(seedData.btns, (btn, name) => {
+        // Backwards compat: If we get an old style object, convert it to an
+        // array in the natural JS object key order.
+        if (Object.prototype.toString.call(seedData.btns) === '[object Object]') {
+          let btnArray = [];
+          angular.forEach(seedData.btns, (btn, name) => {
+            btn.name = name;
+            btnArray.push(btn);
+          });
+          $scope.btns = seedData.btns = btnArray;
+        }
+
+        angular.forEach(seedData.btns, btn => {
           if (btn.template) {
-            $templateCache.put(name, btn.template);
+            $templateCache.put(btn.name, btn.template);
           }
 
           if (btn.action) {
-            $scope.callbacks[name] = function () {
+            $scope.callbacks[btn.name] = function () {
               client.call({
-                method: 'child-to-parent',
-                args: { key: name, payload: {} }
+                method: 'childToParent',
+                args: { key: btn.name, payload: {} }
               });
             };
           } else {
-            $scope.callbacks[name] = function () {
+            $scope.callbacks[btn.name] = function () {
               if (btn.close !== false) {
                 $scope.close();
               }
