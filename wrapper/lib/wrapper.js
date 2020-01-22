@@ -338,7 +338,8 @@ async function compileProviderIsReady () {
           }
 
           $scope.setBtnDisabled = (name, disabled = true) => {
-            $scope.btns[name].disabled = disabled;
+            const btn = $scope.btns.find(b => b.name === name);
+            if (btn) btn.disabled = disabled;
           };
         }
 
