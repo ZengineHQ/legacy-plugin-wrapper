@@ -3,11 +3,11 @@
 ## Requirements
 NodeJS: version 10.10+
 
-## Quick and Dirty
+## Quick and Dirty (for mayan repos)
 
-If you just want a snapshot of the steps, try walking through this first, and consult the expanded docs below if you get stuck.
+If you just want a snapshot of the steps for migrating an existing mayan repo, try walking through this first, and consult the [expanded docs below](#migration-steps) if you get stuck.
 
-**If you're using Mayan, and you haven't created a maya.json with a default environment, do that first!**
+**If you're using Mayan, and you haven't created a maya.json in the repo you intend to migrate, do that first!**
 
 1. cd into your plugin's frontend code directory (in mayan projects: `cd ./plugins/name-of-plugin`)
 2. `npm i -g ZengineHQ/zengine-migrator` to install the migrator tool globally
@@ -27,31 +27,39 @@ Originally, our plugin system applied plugin code to Zengine Admin UI by directl
 
 Therefore, this project forms the basis for converting "legacy" plugins into full-blown SPAs designed to run within an iframe in the new Zengine plugin system.
 
-## Process Details
+## Migration Steps
 
 1. Ensure your structure is correct
 
-    mayan users:
+    - Non-mayan repo:
 
-        ├── backend/**/*.*
-        ├── plugins
-        │   └── name-of-plugin
-        │       ├── node_modules
-        │       ├── src
-        │       │   ├── example-main.css
-        │       │   ├── example-main.html
-        │       │   └── example-main.controller.js
-        │       ├── package.json
-        │       ├── package-lock.json
-        │       └── plugin-register.js
-        ├── maya_build/**/*.*
-        ├── maya.json   # If you don't have this, you need it!
-        ├── maya.example.json
-        ├── node_modules
-        ├── README.md
-        ├── package.json
-        ├── package-lock.json
-        └── .gitignore
+    ```sh
+    # cd into empty directory
+    # (this will end up being the top-level of a new mayan project)
+    mkdir my-zengine-plugin
+    cd my-zengine-plugin
+    ```
+
+    - Existing mayan repo:
+
+    ```
+    ├── backend/**/*.*
+    ├── plugins
+    │   └── name-of-plugin
+    │       ├── node_modules
+    │       ├── src
+    │       │   ├── example-main.css
+    │       │   ├── example-main.html
+    │       │   └── example-main.controller.js
+    │       ├── package.json
+    │       ├── package-lock.json
+    │       └── plugin-register.js
+    ├── maya_build/**/*.*
+    ├── maya.json   # If you don't have this, you need it!
+    ├── maya.example.json
+    ├── README.md
+    └── .gitignore
+    ```
 
 2. Install the migration cli tool
 
@@ -59,17 +67,31 @@ Therefore, this project forms the basis for converting "legacy" plugins into ful
 
 3. Run the migration commands in the proper frontend directory
 
-    Change directory to `/plugins/name-of-plugin` and run:
+    - Non-mayan repo:
 
     ```sh
-    zmig # this will scaffold the legacy wrapper around your project
-    npm install
-    npm start # spins up development server at localhost:1234
+    zmig --id 123 --token abc456
+    # --dirname name-of-plugin
+    # can also be passed, otherwise, you'll be prompted to name your frontend directory
+    # during the migration
+
+    # your source code will be pulled from the Zengine API and inserted at
+    # ./plugins/name-of-plugin/src/plugin.(css|js|html)
+    ```
+
+    - Existing mayan repo:
+
+    ```sh
+    cd ./plugins/name-of-plugin
+    zmig # this will scaffold the legacy wrapper around the frontend code in this directory
+    npm install # install deps
+    cd ../.. # back to top-level of project
+    mayan w name-of-plugin -f # spins up development server at localhost:1234 for your migrated frontend code
     ```
 
     New structure of your project:
 
-        ├── backend/**/*.*
+        ├── backend/ <-- if applicable
         ├── plugins
         │   └── name-of-plugin <-- this folder is where all of the changes take place
         │       ├── .legacy-output (this is a cached version of the collated and modified source files)
@@ -109,9 +131,8 @@ Therefore, this project forms the basis for converting "legacy" plugins into ful
         │       ├── package-lock.json
         │       └── plugin-register.js
         ├── maya_build/**/*.*
-        ├── maya.json   # If you don't have this, you need it!
+        ├── maya.json
         ├── maya.example.json
-        ├── node_modules
         ├── README.md
         ├── package.json
         ├── package-lock.json
@@ -384,11 +405,43 @@ With that in mind, here are a few nuances to be aware of during the build proces
 
 ## Environments
 
-Just like Mayan could take a specific environment from the maya.json, the `ZENGINE_ENV` shell variable is used to determine that environment.
+Use `mayan` commands to serve, build, deploy, and publish your plugin's various environments. 
 
-To help you take advantage of this variable easily, a list of build and dev scripts are automatically created based on the current maya.json environments. Whichever environment is designated as default is used to augment the `start` and `build` script, so you can run `npm start` for your default environment, or specify an environment with `npm run dev-env-name` to serve locally and `npm run build-env-name` to build for deployment.
+The `ZENGINE_ENV` shell variable is used to determine that environment from the maya.json.
 
-Consult your package.json to see what commands are currently available or to adjust them to your needs after the same patterns.
+One way to take advantage of this variable in your migrated legacy plugin, is to choose from the list of build and dev scripts which are automatically created in the `package.json` based on the current maya.json environments at the time of migration. Specify an environment with `npm run dev-env-name` to serve locally and `npm run build-env-name` to build for deployment. Check out your package.json to see what commands are currently available or to adjust them to your needs after the same patterns.
+
+Alternatively, use `mayan` to pass the right environment variables to the default `start` or `build` scripts. Marking a plugin with `"version": 2` will cause mayan to use the new build process of your migrated plugin.
+
+#### Example:
+
+maya.json:
+
+```js
+{
+  "environments": {
+    "dev": {
+      "plugins": {
+        "name-of-directory": { // assumes a frontend code directory at ./plugins/name-of-directory
+          "id": 123,
+          "namespace": "my-cool-plugin",
+          "route": "/my-cool-plugin", // deprecated legacy property (invalid in version 2+)
+          "version": 2
+        }
+      }
+      "default": true
+    }
+  }
+}
+```
+
+bash:
+
+```
+mayan watch -f -e dev
+```
+
+This configuration and command will serve up (`watch`) the frontend (`-f`) of your plugin locally with HMR so you can see changes to your plugin live in the Admin UI as you make them. The plugin id 123 and namespace 'my-cool-plugin' will be used to build your app, based on the environment (`-e dev`) specified in the command. This is a migrated plugin, so having `"version": 2` in the configuration is critical to ensuring the build process is correct.
 
 ## Managing Dependencies
 
