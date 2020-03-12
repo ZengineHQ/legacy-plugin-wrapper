@@ -98,7 +98,11 @@ export function ZnData (plugin) {
       PluginServiceUploads: ['/plugins/:pluginId/services/:serviceId/uploads', null, {
         multipartKey: 'draftSource'
       }],
+      PluginSettings: ['/plugins/:pluginId/settings', 'pluginId'],
       WorkspacePluginLinks: ['/workspace_plugin_links/:id'],
+      PluginConfigs: ['/plugins_configs/:id', null, {
+        objectVersionField: 'objectVersion'
+      }],
       Organizations: ['/organizations/:id'],
       OrganizationsAuthProviders: ['/organizations/:organizationId/auth_providers/:id'],
       AuthProviders: ['/auth_providers/:id']
