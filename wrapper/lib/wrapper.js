@@ -125,6 +125,7 @@ async function compileProviderIsReady () {
     context = await client.call({ method: 'context' });
 
     plugin.namespace = context.plugin.namespace;
+    plugin.context = context;
 
     let currentInterface = {};
 
