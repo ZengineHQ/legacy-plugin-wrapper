@@ -470,3 +470,73 @@ Example: `var namespace = $scope.pluginName` => `var namespace => plugin.namespa
 ### $window
 
 `$window` from Angular made some assumptions about the plugin's runtime context that couldn't be supported properly in Version 2, so this modification changes all references to `$window` to point to a custom service in the legacy wrapper: `znWindow`. Behavior is expected to be consistent after this change.
+
+## Adding a Separate Frontend App to your Migrated Plugin Code
+
+Here are the steps to take to keep your migrated views (like a settings page, for example), and also develop a _new_ view (like a main fullPage) using your frontend technology of choice (like React) with the same parcel build process already present in your plugin repo.
+
+1. Create your new frontend in a new folder (I called mine main):
+    ```
+    /zn-plugin-my-plugin
+      /plugins
+        /my-plugin
+          /src <-- v1 settings code still lives here
+          /main <-- new, separate frontend (React maybe) lives here
+            main.js <-- React code :)
+            styles.css <-- way better styles I'm sure lol
+          main.html <-- entry point for new frontend page, at "top level" of frontend directory
+    ```
+
+    NB: name your new html entry point something different than index.html, because parcel will use that name to build your stuff and distinguish from the other entry points. index.html is already being used by the old code.
+
+2. Move several files (and adjust a few imports as a result)
+    - index.html needs to move out of /wrapper so it is an immediate child of /my-plugin (just like our new main.html). Adjust the imports in index.html link and script tags (`"plugin.js" => "wrapper/plugin.js"` and `"plugin.scss" => "wrapper/plugin.scss"`).
+    - the directories `/wrapper/fonts`, `/wrapper/images`, and `/wrapper/imgs` all need to be moved to the top of /my-plugin, as well. You actually won’t need to adjust any imports for this movement, surprisingly. This is to align them with the updated parcel build configuration, since we will now have two entry points at the top level /my-plugin and not just one at /my-plugin/wrapper.
+
+3. `npm i parcel-plugin-copy-files -D` and put this in your package.json:
+
+    ```
+    {
+      ...,
+      "files-to-copy: ["plugin.json"]
+    }
+    ```
+
+4. Having two entry points in parcel breaks some of the legacy-builder’s ability to dynamically generate the plugin.json, and so you will need to manually create a /my-plugin/plugin.json file. Here is an example of what it might look like now:
+
+    ```
+    {
+      "icon": "icon-share",
+      "views": [
+        {
+          "src": "/index.html",
+          "type": "settings"
+        },
+        {
+          "src": "/index.html",
+          "type": "inline",
+          "location": "zn-plugin-form-top"
+        },
+        {
+          "src": "/main.html", <-- new one!
+          "type": "fullPage",
+          "hideIcon": false
+        }
+      ]
+    }
+    ```
+
+    If you’re not sure what it should look like, you can start by looking at your previously generated plugin.json file in the dist folder, and then just add a view for your new entry point.
+
+5. Adjust your start and build scripts in your frontend package.json (compare with your current to make sure any other additions to your scripts are captured in these changes):
+
+    ```
+    {
+      "scripts": {
+        "start": "rm -rf dist; parcel serve main.html index.html --https",
+        "build": "rm -rf dist; parcel build main.html index.html --no-cache"
+      }
+    }
+    ```
+
+    What's important about these changes is the two positionals reflecting the new entry points that parcel will serve and build `main.html index.html`.
