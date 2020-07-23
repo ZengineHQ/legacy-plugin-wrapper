@@ -528,6 +528,8 @@ Here are the steps to take to keep your migrated views (like a settings page, fo
 
     If you’re not sure what it should look like, you can start by looking at your previously generated plugin.json file in the dist folder, and then just add a view for your new entry point.
 
+   **Make sure to remove `plugin.json` from your `.gitignore`!**
+
 5. Adjust your start and build scripts in your frontend package.json (compare with your current to make sure any other additions to your scripts are captured in these changes):
 
     ```
