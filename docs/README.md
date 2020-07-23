@@ -498,7 +498,7 @@ Here are the steps to take to keep your migrated views (like a settings page, fo
     ```
     {
       ...,
-      "files-to-copy: ["plugin.json"]
+      "files-to-copy": ["plugin.json"]
     }
     ```
 
