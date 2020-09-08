@@ -77,7 +77,8 @@ export function ZnData (plugin) {
       WebhookEvents: ['/webhook_events/:id'],
       Workspaces: ['/workspaces/:id'],
       WorkspaceInvitees: ['/workspaces/:workspaceId/invitees/:id'],
-      WorkspaceMembers: ['/workspaces/:workspaceId/members/:id'],
+	  WorkspaceUserRoles: ['/workspaces/:workspaceId/user_roles'],
+	  WorkspaceMembers: ['/workspaces/:workspaceId/members/:id'],
       WorkspaceTransferRequests: ['/workspaces/:workspaceId/transfer_requests/:id'],
       WorkspaceTaskPreferences: ['/workspaces/:workspaceId/members/:memberId/task_preferences', 'memberId'],
       WorkspaceLogo: ['/workspaces/:workspaceId/logo', null, {
