@@ -1,4 +1,4 @@
-import "core-js/stable";
+import "@babel/polyfill";
 import "regenerator-runtime/runtime";
 import ZnFilterMatcher from 'zn-filter-matcher';
 import Client from '@zenginehq/post-rpc-client';
