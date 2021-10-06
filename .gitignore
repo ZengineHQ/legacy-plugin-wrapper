@@ -1,6 +1,7 @@
 .cache
 .legacy-output
 .vscode
+.idea/
 dist
 dist.zip
 node_modules
