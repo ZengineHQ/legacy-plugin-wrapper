@@ -101,6 +101,7 @@ export function ZnData (plugin) {
       }],
       PluginSettings: ['/plugins/:pluginId/settings', 'pluginId'],
       WorkspacePluginLinks: ['/workspace_plugin_links/:id'],
+      WorkspaceFormLinks: ['/workspace_form_links/:id'],
       PluginConfigs: ['/plugins_configs/:id', null, {
         objectVersionField: 'objectVersion'
       }],
