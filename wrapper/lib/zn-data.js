@@ -101,6 +101,7 @@ export function ZnData (plugin) {
       }],
       PluginSettings: ['/plugins/:pluginId/settings', 'pluginId'],
       WorkspacePluginLinks: ['/workspace_plugin_links/:id'],
+      WorkspaceFormLinks: ['/workspace_form_links/:id'],
       PluginConfigs: ['/plugins_configs/:id', null, {
         objectVersionField: 'objectVersion'
       }],
@@ -201,6 +202,29 @@ export function ZnData (plugin) {
       return {
         get: request.curry(path, { pathParams }, 'get'),
         query: request.curry(idRemovedPath, { pathParams }, 'get'),
+        fetchAll: function(params) {
+          var batchParams = angular.copy(params);
+          batchParams.page = 1;
+          if (!batchParams.limit) {
+            batchParams.limit = 100;
+          }
+          var data = [];
+          var done = false;
+          function getBatch() {
+            return request(idRemovedPath, { pathParams }, 'get', batchParams, function(results, meta) {
+              data = results ? data.concat(results) : data;
+              if (meta.totalCount > data.length) {
+                batchParams.page++;
+              } else {
+                done = true;
+              }
+            }).then(function() {
+              return done ? data : getBatch();
+            });
+          }
+
+          return getBatch();
+        },
         count: function (params, success, error) {
           return request(idRemovedPath + '/count', { pathParams }, 'get', params, success, error);
         },
