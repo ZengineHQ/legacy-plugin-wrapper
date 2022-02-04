@@ -84,7 +84,8 @@ export function ZnData (plugin) {
       WorkspaceLogo: ['/workspaces/:workspaceId/logo', null, {
         multipartKey: 'logo'
       }],
-      WorkspaceCopyJobs: ['/workspace_copy_jobs'],
+      WorkspaceCopyJobs: ['/workspace_copy_jobs'], 
+      WorkspaceFormLinks: ['/workspace_form_links'],
       Countries: ['/countries'],
       States: ['/states'],
       Subscriptions: ['/subscriptions/:id'],
@@ -201,6 +202,28 @@ export function ZnData (plugin) {
       return {
         get: request.curry(path, { pathParams }, 'get'),
         query: request.curry(idRemovedPath, { pathParams }, 'get'),
+        fetchAll: function (params) {
+          var batchParams = angular.copy(params);
+          batchParams.page = 1;
+          if (!batchParams.limit) {
+              batchParams.limit = 100;
+          }
+          var data = [];
+          var done = false;
+          function getBatch () {
+              return request(idRemovedPath, { pathParams }, 'get', batchParams, function (results, meta) {
+                  data = results ? data.concat(results) : data;
+                  if (meta.totalCount > data.length) {
+                      batchParams.page++;
+                  } else {
+                      done = true;
+                  }
+              }).then(function () {
+                  return done ? data : getBatch();
+              });
+          }
+          return getBatch();
+        },
         count: function (params, success, error) {
           return request(idRemovedPath + '/count', { pathParams }, 'get', params, success, error);
         },
