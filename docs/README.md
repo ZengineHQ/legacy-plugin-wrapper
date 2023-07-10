@@ -16,6 +16,7 @@ If you just want a snapshot of the steps for migrating an existing mayan repo, t
 5. Do any acceptance testing to verify your plugin works and fix any issues
 6. `npm run build` to create zip file
 7. Use Zengine Developer UI to post a draft and/or publish the fully migrated plugin
+8. Do not forget to update your maya.json to include `version:2` so mayan knows how to deploy the updated plugin
 
 ## Background
 
