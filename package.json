@@ -25,12 +25,12 @@
   },
   "homepage": "https://github.com/Wizehive/zengine-plugin-migrator#readme",
   "devDependencies": {
-	  "eslint": "^7.0.0",
-	  "eslint-config-prettier": "^8.8.0",
-	  "parcel-bundler": "^1.12.5",
-	  "parcel-plugin-zengine-migrator": "github:ZengineHQ/parcel-plugin-zengine-migrator",
-	  "prettier": "^3.0.0",
-	  "sass": "^1.22.12"
+    "eslint": "^7.0.0",
+    "eslint-config-prettier": "^8.8.0",
+    "parcel-bundler": "^1.12.5",
+    "parcel-plugin-zengine-migrator": "github:ZengineHQ/parcel-plugin-zengine-migrator",
+    "prettier": "^3.0.0",
+    "sass": "^1.22.12"
   },
   "dependencies": {
     "@zenginehq/post-rpc-client": "^0.9.0",
