@@ -1,8 +1,9 @@
+.idea
 .cache
 .legacy-output
 .vscode
 dist
 dist.zip
 node_modules
-package-lock.json
+maya.json
 plugin.json
